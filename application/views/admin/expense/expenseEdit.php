@@ -9,8 +9,8 @@ $currency_symbol = $this->customlib->getHospitalCurrencyFormat();
     <section class="content">
         <div class="row">
             <?php
-            if ($this->rbac->hasPrivilege('expense', 'can_add') || $this->rbac->hasPrivilege('expense', 'can_edit')) {
-            ?>
+if ($this->rbac->hasPrivilege('expense', 'can_add') || $this->rbac->hasPrivilege('expense', 'can_edit')) {
+    ?>
                 <div class="col-md-4">
                     <!-- Horizontal Form -->
                     <div class="box box-primary">
@@ -18,60 +18,60 @@ $currency_symbol = $this->customlib->getHospitalCurrencyFormat();
                             <h3 class="box-title"><?php echo $this->lang->line('edit_expense'); ?></h3>
                         </div><!-- /.box-header -->
                         <!-- form start -->
-                        <form action="<?php echo site_url("admin/expense/edit/" . $id) ?>" id="employeeform" name="employeeform" method="post" accept-charset="utf-8" enctype="multipart/form-data">
+                        <form action="<?php echo site_url("admin/expense/edit/" . $id) ?>"  id="employeeform" name="employeeform" method="post" accept-charset="utf-8"  enctype="multipart/form-data">
                             <div class="box-body">
 
-                                <?php if ($this->session->flashdata('msg')) { ?>
+                                <?php if ($this->session->flashdata('msg')) {?>
                                     <?php echo $this->session->flashdata('msg') ?>
-                                <?php } ?>
+                                <?php }?>
                                 <?php
-                                if (isset($error_message)) {
-                                    echo "<div class='alert alert-danger'>" . $error_message . "</div>";
-                                }
-                                ?>
+if (isset($error_message)) {
+        echo "<div class='alert alert-danger'>" . $error_message . "</div>";
+    }
+    ?>
                                 <?php echo $this->customlib->getCSRF(); ?>
                                 <div class="form-group">
                                     <label for="exampleInputEmail1"><?php echo $this->lang->line('expense_head'); ?></label><small class="req"> *</small>
-                                    <select autofocus="" id="exp_head_id" name="exp_head_id" class="form-control">
+                                    <select autofocus="" id="exp_head_id" name="exp_head_id" class="form-control" >
                                         <option value=""><?php echo $this->lang->line('select'); ?></option>
                                         <?php
-                                        foreach ($expheadlist as $exphead) {
-                                        ?>
-                                            <option value="<?php echo $exphead['id'] ?>" <?php
-                                                                                            if ($expense['exp_head_id'] == $exphead['id']) {
-                                                                                                echo "selected =selected";
-                                                                                            }
-                                                                                            ?>><?php echo $exphead['exp_category'] ?></option>
-                                        <?php
-                                            $count++;
-                                        }
-                                        ?>
+foreach ($expheadlist as $exphead) {
+        ?>
+                                            <option value="<?php echo $exphead['id'] ?>"<?php
+if ($expense['exp_head_id'] == $exphead['id']) {
+            echo "selected =selected";
+        }
+        ?>><?php echo $exphead['exp_category'] ?></option>
+                                                    <?php
+$count++;
+    }
+    ?>
                                     </select>
                                     <span class="text-danger"><?php echo form_error('exp_head_id'); ?></span>
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputEmail1"><?php echo $this->lang->line('name'); ?></label><small class="req"> *</small>
-                                    <input id="name" name="name" placeholder="" type="text" class="form-control" value="<?php echo set_value('name', $expense['name']); ?>" />
+                                    <input id="name" name="name" placeholder="" type="text" class="form-control"  value="<?php echo set_value('name', $expense['name']); ?>" />
                                     <span class="text-danger"><?php echo form_error('name'); ?></span>
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputEmail1"><?php echo $this->lang->line('invoice_number'); ?></label>
-                                    <input id="invoice_no" name="invoice_no" placeholder="" type="text" class="form-control" value="<?php echo set_value('invoice_no', $expense['invoice_no']); ?>" />
+                                    <input id="invoice_no" name="invoice_no" placeholder="" type="text" class="form-control"  value="<?php echo set_value('invoice_no', $expense['invoice_no']); ?>" />
                                     <span class="text-danger"><?php echo form_error('invoice_no'); ?></span>
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputEmail1"><?php echo $this->lang->line('date'); ?></label><small class="req"> *</small>
-                                    <input id="date" name="date" placeholder="" type="text" class="form-control" value="<?php echo set_value('date', date($this->customlib->getHospitalDateFormat(), $this->customlib->dateyyyymmddTodateformat($expense['date']))); ?>" readonly="readonly" />
+                                    <input id="date" name="date" placeholder="" type="text" class="form-control"  value="<?php echo set_value('date', date($this->customlib->getHospitalDateFormat(), $this->customlib->dateyyyymmddTodateformat($expense['date']))); ?>" readonly="readonly" />
                                     <span class="text-danger"><?php echo form_error('date'); ?></span>
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputEmail1"><?php echo $this->lang->line('amount'); ?></label><small class="req"> *</small>
-                                    <input id="amount" name="amount" placeholder="" type="text" class="form-control" value="<?php echo set_value('amount', $expense['amount']); ?>" />
+                                    <input id="amount" name="amount" placeholder="" type="text" class="form-control"  value="<?php echo set_value('amount', $expense['amount']); ?>" />
                                     <span class="text-danger"><?php echo form_error('amount'); ?></span>
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputEmail1"><?php echo $this->lang->line('attach_document'); ?></label>
-                                    <input id="documents" name="documents" type="file" class="filestyle form-control" />
+                                    <input id="documents" name="documents"  type="file" class="filestyle form-control"   />
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputEmail1"><?php echo $this->lang->line('description'); ?></label>
@@ -88,14 +88,14 @@ $currency_symbol = $this->customlib->getHospitalCurrencyFormat();
 
                 </div><!--/.col (right) -->
                 <!-- left column -->
-            <?php } ?>
+            <?php }?>
             <div class="col-md-<?php
-                                if ($this->rbac->hasPrivilege('expense', 'can_add') || $this->rbac->hasPrivilege('expense', 'can_edit')) {
-                                    echo "8";
-                                } else {
-                                    echo "12";
-                                }
-                                ?>">
+if ($this->rbac->hasPrivilege('expense', 'can_add') || $this->rbac->hasPrivilege('expense', 'can_edit')) {
+    echo "8";
+} else {
+    echo "12";
+}
+?>">
                 <!-- general form elements -->
                 <div class="box box-primary">
                     <div class="box-header ptbnull">
@@ -119,27 +119,27 @@ $currency_symbol = $this->customlib->getHospitalCurrencyFormat();
                                 </thead>
                                 <tbody>
                                     <?php
-                                    if (empty($expenselist)) {
-                                    ?>
+if (empty($expenselist)) {
+    ?>
                                         <?php
-                                    } else {
-                                        foreach ($expenselist as $expense) {
-                                        ?>
+} else {
+    foreach ($expenselist as $expense) {
+        ?>
                                             <tr>
                                                 <td class="mailbox-name">
                                                     <a href="#" data-toggle="popover" class="detail_popover"><?php echo $expense['name'] ?></a>
                                                     <div class="fee_detail_popover" style="display: none">
                                                         <?php
-                                                        if ($expense['note'] == "") {
-                                                        ?>
+if ($expense['note'] == "") {
+            ?>
                                                             <p class="text text-danger"><?php echo $this->lang->line('no_description'); ?></p>
-                                                        <?php
-                                                        } else {
-                                                        ?>
+                                                            <?php
+} else {
+            ?>
                                                             <p class="text text-info"><?php echo $expense['note']; ?></p>
-                                                        <?php
-                                                        }
-                                                        ?>
+                                                            <?php
+}
+        ?>
                                                     </div>
                                                 </td>
                                                 <td class="mailbox-name"><?php echo $expense["invoice_no"]; ?></td>
@@ -151,32 +151,32 @@ $currency_symbol = $this->customlib->getHospitalCurrencyFormat();
                                                 <td class="mailbox-name"><?php echo ($currency_symbol . $expense['amount']); ?></td>
                                                 <td class="mailbox-date pull-right"">
                                                     <?php if ($expense['documents']) {
-                                                    ?>
-                                                        <a href=" <?php echo base_url(); ?>admin/expense/download/<?php echo $expense['documents'] ?>" class="btn btn-default btn-xs" data-toggle="tooltip" title="<?php echo $this->lang->line('download'); ?>">
-                                                    <i class="fa fa-download"></i>
-                                                    </a>
-                                                <?php }
-                                                ?>
-                                                <?php
-                                                if ($this->rbac->hasPrivilege('expense', 'can_edit')) {
-                                                ?>
-                                                    <a href="<?php echo base_url(); ?>admin/expense/edit/<?php echo $expense['id'] ?>" class="btn btn-default btn-xs" data-toggle="tooltip" title="<?php echo $this->lang->line('edit'); ?>">
-                                                        <i class="fa fa-pencil"></i>
-                                                    </a>
-                                                <?php
-                                                }
-                                                if ($this->rbac->hasPrivilege('expense', 'can_delete')) {
-                                                ?>
-                                                    <a href="<?php echo base_url(); ?>admin/expense/delete/<?php echo $expense['id'] ?>" class="btn btn-default btn-xs" data-toggle="tooltip" title="<?php echo $this->lang->line('delete'); ?>" onclick="return confirm('<?php echo $this->lang->line('delete_confirm') ?>');">
-                                                        <i class="fa fa-remove"></i>
-                                                    </a>
-                                                <?php } ?>
+            ?>
+                                                        <a href="<?php echo base_url(); ?>admin/expense/download/<?php echo $expense['documents'] ?>" class="btn btn-default btn-xs"  data-toggle="tooltip" title="<?php echo $this->lang->line('download'); ?>">
+                                                            <i class="fa fa-download"></i>
+                                                        </a>
+                                                    <?php }
+        ?>
+                                                    <?php
+if ($this->rbac->hasPrivilege('expense', 'can_edit')) {
+            ?>
+                                                        <a href="<?php echo base_url(); ?>admin/expense/edit/<?php echo $expense['id'] ?>" class="btn btn-default btn-xs"  data-toggle="tooltip" title="<?php echo $this->lang->line('edit'); ?>">
+                                                            <i class="fa fa-pencil"></i>
+                                                        </a>
+                                                        <?php
+}
+        if ($this->rbac->hasPrivilege('expense', 'can_delete')) {
+            ?>
+                                                        <a href="<?php echo base_url(); ?>admin/expense/delete/<?php echo $expense['id'] ?>" class="btn btn-default btn-xs"  data-toggle="tooltip" title="<?php echo $this->lang->line('delete'); ?>" onclick="return confirm('<?php echo $this->lang->line('delete_confirm') ?>');">
+                                                            <i class="fa fa-remove"></i>
+                                                        </a>
+                                                    <?php }?>
                                                 </td>
                                             </tr>
-                                    <?php
-                                        }
-                                    }
-                                    ?>
+                                            <?php
+}
+}
+?>
                                 </tbody>
                             </table><!-- /.table -->
                         </div><!-- /.mail-box-messages -->
@@ -188,12 +188,12 @@ $currency_symbol = $this->customlib->getHospitalCurrencyFormat();
         <div class="row">
             <div class="col-md-12">
             </div><!--/.col (right) -->
-        </div> <!-- /.row -->
+        </div>   <!-- /.row -->
     </section><!-- /.content -->
 </div><!-- /.content-wrapper -->
 
 <script type="text/javascript">
-    $(document).ready(function() {
+    $(document).ready(function () {
         var date_format = '<?php echo $result = strtr($this->customlib->getHospitalDateFormat(), ['d' => 'dd', 'm' => 'mm', 'Y' => 'yyyy']) ?>';
         $('#date').datepicker({
             format: date_format,
@@ -203,13 +203,13 @@ $currency_symbol = $this->customlib->getHospitalCurrencyFormat();
     });
 </script>
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         $('.detail_popover').popover({
             placement: 'right',
             trigger: 'hover',
             container: 'body',
             html: true,
-            content: function() {
+            content: function () {
                 return $(this).closest('td').find('.fee_detail_popover').html();
             }
         });

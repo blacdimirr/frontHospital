@@ -1,209 +1,437 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Formulario Médico - Hospital San Lorenzo</title>
-    <style>
-        .body-pdf {
-            font-family: Arial, sans-serif;
-            margin: 10px;
+<?php
+$currency_symbol = $this->customlib->getHospitalCurrencyFormat();
+?>
+<style type="text/css">
+    @media print {
+        .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12 {
+            float: left;
         }
-
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .hospital-name {
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .form-section {
-            border: 1px solid #000;
-            margin: 10px 0;
-            padding: 10px;
-        }
-
-        .section-title {
-            font-weight: bold;
-            margin-bottom: 10px;
-            border-bottom: 1px solid #000;
-            background-color: #0bb7e1 !important;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact; 
-        }
-
-        .form-table {
+        .col-sm-12 {
             width: 100%;
-            border-collapse: collapse;
-            margin: 10px 0;
         }
+        .col-sm-11 {
+            width: 91.66666667%;
+        }
+        .col-sm-10 {
+            width: 83.33333333%;
+        }
+        .col-sm-9 {
+            width: 75%;
+        }
+        .col-sm-8 {
+            width: 66.66666667%;
+        }
+        .col-sm-7 {
+            width: 58.33333333%;
+        }
+        .col-sm-6 {
+            width: 50%;
+        }
+        .col-sm-5 {
+            width: 41.66666667%;
+        }
+        .col-sm-4 {
+            width: 33.33333333%;
+        }
+        .col-sm-3 {
+            width: 25%;
+        }
+        .col-sm-2 {
+            width: 16.66666667%;
+        }
+        .col-sm-1 {
+            width: 8.33333333%;
+        }
+        .col-sm-pull-12 {
+            right: 100%;
+        }
+        .col-sm-pull-11 {
+            right: 91.66666667%;
+        }
+        .col-sm-pull-10 {
+            right: 83.33333333%;
+        }
+        .col-sm-pull-9 {
+            right: 75%;
+        }
+        .col-sm-pull-8 {
+            right: 66.66666667%;
+        }
+        .col-sm-pull-7 {
+            right: 58.33333333%;
+        }
+        .col-sm-pull-6 {
+            right: 50%;
+        }
+        .col-sm-pull-5 {
+            right: 41.66666667%;
+        }
+        .col-sm-pull-4 {
+            right: 33.33333333%;
+        }
+        .col-sm-pull-3 {
+            right: 25%;
+        }
+        .col-sm-pull-2 {
+            right: 16.66666667%;
+        }
+        .col-sm-pull-1 {
+            right: 8.33333333%;
+        }
+        .col-sm-pull-0 {
+            right: auto;
+        }
+        .col-sm-push-12 {
+            left: 100%;
+        }
+        .col-sm-push-11 {
+            left: 91.66666667%;
+        }
+        .col-sm-push-10 {
+            left: 83.33333333%;
+        }
+        .col-sm-push-9 {
+            left: 75%;
+        }
+        .col-sm-push-8 {
+            left: 66.66666667%;
+        }
+        .col-sm-push-7 {
+            left: 58.33333333%;
+        }
+        .col-sm-push-6 {
+            left: 50%;
+        }
+        .col-sm-push-5 {
+            left: 41.66666667%;
+        }
+        .col-sm-push-4 {
+            left: 33.33333333%;
+        }
+        .col-sm-push-3 {
+            left: 25%;
+        }
+        .col-sm-push-2 {
+            left: 16.66666667%;
+        }
+        .col-sm-push-1 {
+            left: 8.33333333%;
+        }
+        .col-sm-push-0 {
+            left: auto;
+        }
+        .col-sm-offset-12 {
+            margin-left: 100%;
+        }
+        .col-sm-offset-11 {
+            margin-left: 91.66666667%;
+        }
+        .col-sm-offset-10 {
+            margin-left: 83.33333333%;
+        }
+        .col-sm-offset-9 {
+            margin-left: 75%;
+        }
+        .col-sm-offset-8 {
+            margin-left: 66.66666667%;
+        }
+        .col-sm-offset-7 {
+            margin-left: 58.33333333%;
+        }
+        .col-sm-offset-6 {
+            margin-left: 50%;
+        }
+        .col-sm-offset-5 {
+            margin-left: 41.66666667%;
+        }
+        .col-sm-offset-4 {
+            margin-left: 33.33333333%;
+        }
+        .col-sm-offset-3 {
+            margin-left: 25%;
+        }
+        .col-sm-offset-2 {
+            margin-left: 16.66666667%;
+        }
+        .col-sm-offset-1 {
+            margin-left: 8.33333333%;
+        }
+        .col-sm-offset-0 {
+            margin-left: 0%;
+        }
+        .visible-xs {
+            display: none !important;
+        }
+        .hidden-xs {
+            display: block !important;
+        }
+        table.hidden-xs {
+            display: table;
+        }
+        tr.hidden-xs {
+            display: table-row !important;
+        }
+        th.hidden-xs,
+        td.hidden-xs {
+            display: table-cell !important;
+        }
+        .hidden-xs.hidden-print {
+            display: none !important;
+        }
+        .hidden-sm {
+            display: none !important;
+        }
+        .visible-sm {
+            display: block !important;
+        }
+        table.visible-sm {
+            display: table;
+        }
+        tr.visible-sm {
+            display: table-row !important;
+        }
+        th.visible-sm,
+        td.visible-sm {
+            display: table-cell !important;
+        }
+    }
 
-        .form-table td, .form-table th {
-            border: 1px solid;
-            padding: 5px;
-            vertical-align: top;
-        }
+    .printablea4{width: 100%;}
+    .printablea4>tbody>tr>th,
+    .printablea4>tbody>tr>td{padding:2px 0; line-height: 1.42857143;vertical-align: top; font-size: 12px;}
+</style>
 
-        .input-field {
-            border-bottom: 1px solid #000;
-            display: inline-block;
-            min-width: 150px;
-            margin: 2px 5px;
-        }
-
-        .input-field-short {
-            border-bottom: 1px solid #000;
-            display: inline-block;
-            min-width: 50px;
-            margin: 2px 5px;
-        }
-        .input-field-long {
-            border-bottom: 1px solid #000;
-            display: inline-block;
-            min-width: 200px;
-            margin: 2px 5px;
-        }
-        .input-field-extra {
-            border-bottom: 1px solid #000;
-            display: inline-block;
-            width: 100%;
-            margin: 2px 5px;
-        }
-
-        .grid-2col {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .grid-2col-extra {
-            display: grid;
-            grid-template-columns: 2fr;
-            gap: 10px;
-        }
-
-        .checkbox-group {
-            margin: 5px 0;
-        }
-
-        .signature-box {
-            margin-top: 30px;
-            border-top: 1px solid #000;
-            width: 200px;
-            padding-top: 5px;
-        } 
-    </style>
-    <link rel="stylesheet" href="<?php echo base_url(); ?>backend/dist/css/sh-print.css">
-</head>
-<body>
-    <div class="body-pdf">
-        <div class="print-area">
-            <div class="header">
-                <div class="hospital-name">HOSPITAL MATERNO INFANTIL<br>SAN LORENZO DE LOS MINA</div>
-                <div>Hoja de Orden Médica<br><?php echo 'DAR-FO'.$result->opd_detail_id; ?> Versión: 01</div>
-            </div>
-        
-            <div class="form-section">
-                <div class="section-title">DATOS DEL PACIENTE</div>
-                <div class="grid-2col">
-                    <div>NO. DE EXPEDIENTE CLINICO: <span class="input-field"><?php echo 'DAR-FO'.$result->opd_detail_id; ?></span></div>
-                    <div>SALA O HABITACION: <span class="input-field"><?php if (!empty($camas['grupo_cama'])) echo $camas['grupo_cama']; ?></span></div>
-                    <div>NO DE CAMA: <span class="input-field"><?php if (!empty($camas['cama'])) echo $camas['cama']; ?></span></div>
-                    <div>FECHA: <span class="input-field"><?php echo date('d-m-Y');?></span></div>
-                    <div>MEDICO RESPONSABLE: <span class="input-field"> <?php echo $result->name.' '.$result->surname ; ?> </span></div>
-                    <div>HORA: <span class="input-field"> <?php echo date('h:i A'); ?> </span></div>
-                </div>
-            </div>
-            <div class="form-section">
-                <div class="section-title">DATOS DEL PACIENTE</div>
-                <div class="grid-2col">
-                    <div>NOMBRES y APELLIDOS: <span class="input-field"> <?php echo $result->patient_name; ?> </span></div>
-                    <div>CÉDULA/PASAPORTE: <span class="input-field"> <?php echo $result->identification_number; ?></span></div>
-                    <div>SEXO: <span class="input-field-short"><?php echo $result->gender; ?></span> EDAD: <span class="input-field-short"><?php echo $result->age; ?></span>PESO: <span class="input-field-short"><?php echo $result->weight; ?></span></div>
-                    <div>DIRECCIÓN: <span class="input-field-long"><?php echo $result->address; ?></span></div>
-                    <div>CIE-10: <span class="input-field-short"></span></div>
-                </div>
-            </div>
-        
-            <div class="form-section">
-                <div class="section-title">ORDEN MÉDICA</div>
-                <table class="form-table">
-                    <tr>
-                        <th>MEDICAMENTO</th>
-                        <th>DOSIS</th>
-                        <!-- <th><?php echo $this->lang->line("dose_interval"); ?></th> -->
-                        <th>FRECUENCIA</th>
-                        <th>VÍA</th>
-                    </tr>
-                    <?php $medsl =''; foreach ($result->medicines as $pkey => $pvalue) { $medsl++; ?>
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title><?php echo $this->lang->line('prescription'); ?></title>
+    </head>
+    <div id="html-2-pdfwrapper">
+        <div class="row">
+            <!-- left column -->
+            <div class="col-md-12">
+                <div class="pprinta4">
+                <?php  if (!empty($print_details['print_header'])) { ?>
+                    <img src="<?php
+                    if (!empty($print_details['print_header'])) {
+                        echo base_url() . $print_details['print_header'].img_time();
+                    }
+                    ?>" style="height:100px; width:100%;" class="img-responsive">
+                <?php }?>
+                    <div style="height: 10px; clear: both;"></div>
+                </div> 
+                <div class="">
+                    <?php
+                    $date = $result->presdate;
+                    ?>
+                    <table width="100%" class="printablea4">                       
                         <tr>
-                            <td class="text text-center"><?php echo $pvalue->medicine_name; ?></td>
-                            <td class="text text-center"><?php echo $pvalue->dosage." ".$pvalue->unit; ?></td>
-                            <!-- <td class="text text-center"><?php echo $pvalue->dose_interval_name; ?></td> -->
-                            <td class="text text-center"><?php echo $pvalue->dose_interval_name; ?></td>
-                            <td class="text text-center"><?php echo $pvalue->instruction; ?></td>
-                        </tr>  
-                    <?php } ?>
-                </table>
-            </div>
-        
-            <div class="form-section">
-                <?php if(!empty($result->header_note)) {?>
-                    <div>
-                        <div class="section-title">Nota: </div>
-                        <?php echo $result->header_note ?>
-                    </div>
-                <?php }?>
+                            <th><?php echo $this->lang->line('prescription'); ?> : <?php echo $this->customlib->getSessionPrefixByType('opd_prescription').$result->prescription_id; ?></th> <td></td>
+                            <th class="text-right"></th> 
+                            <th class="text-right"><?php echo $this->lang->line('date'); ?> : <?php
+                                if (!empty($result->presdate)) {
+                                    echo $this->customlib->YYYYMMDDTodateFormat($date);
+                                }
+                                ?>
+                            </th>
+                        </tr>
+                    </table>
+                    <hr style="height: 1px; clear: both;margin-bottom: 10px; margin-top: 10px" />
+                    <table width="100%" class="printablea4">
+                        <tr>
+                            <th width="25%"><?php echo $this->lang->line("opd_id"); ?></th>
+                            <td width="25%"><?php echo $this->customlib->getSessionPrefixByType('opd_no') .$result->opd_detail_id ; ?></td>
+                            <th width="25%"><?php echo $this->lang->line("temperature"); ?></th>
+                            <td width="25%"><?php echo $result->temperature ; ?></td>                        
+                        </tr>
+                        <tr> 
+                                <th width="25%"><?php echo $this->lang->line("checkup_id"); ?></th>
+                                <td width="25%"><?php echo $this->customlib->getSessionPrefixByType('checkup_id') .$result->visitid ; ?></td>
+                                <th width="25%"><?php echo $this->lang->line("pulse"); ?></th>
+                                <td width="25%"><?php echo $result->pulse; ?></td>               
+                        
+                        </tr>
+                        <tr>
+                            <th width="25%"><?php echo $this->lang->line("patient_name"); ?></th>
+                            <td width="25%"><?php echo $result->patient_name ?> (<?php echo $result->id ?>)</td>
+                            <th width="25%"><?php echo $this->lang->line("age"); ?></th>
+                            <td><?php
+                                echo $this->customlib->getPatientAge($result->age,$result->month,$result->day);
+                                ?></td>
+                        </tr>
+                        <tr>                            
+                            <th width="25%"><?php echo $this->lang->line("gender"); ?></th>
+                            <td><?php echo $result->gender ?></td>
+                            <th width="25%"><?php echo $this->lang->line("weight"); ?></th>
+                            <td><?php echo $result->weight ?></td>
+                        </tr>
+                        <tr>                            
+                            <th width="25%"><?php echo $this->lang->line("bp"); ?></th>
+                            <td><?php echo $result->bp ?></td>
+                            <th width="25%"><?php echo $this->lang->line("height"); ?></th>
+                            <td><?php echo $result->height ?></td>
+                        </tr>
+                        <tr>                            
+                            <th width="25%"><?php echo $this->lang->line("known_allergies"); ?></th>
+                            <td><?php echo $result->any_allergies ?></td>                        
+                            <th width="25%"><?php echo $this->lang->line("blood_group"); ?></th>
+                            <td><?php echo $result->blood_group_name ?></td>
+                        </tr>
+                        <tr>
+                            <th width="25%"><?php echo $this->lang->line("phone"); ?></th>
+                            <td width="25%"><?php echo $result->mobileno ?></td>   
+                            <th width="25%"><?php echo $this->lang->line("email"); ?></th>
+                            <td width="25%"><?php echo $result->email ?></td>
+                        </tr> 
+                        <tr>        
+                            <th><?php echo $this->lang->line('consultant_doctor'); ?></th><td><?php echo $result->name . " " . $result->surname ?> (<?php echo $result->doctor_id ?>)</td>
+                            <th><?php echo $this->lang->line('prescribe_by'); ?></th><td><?php echo $result->prescribe_by_name . " " . $result->prescribe_by_surname ?> (<?php echo $result->prescribe_by_employee_id ?>)</td>                            
+                        </tr>
+                        <tr>        
+                            <th><?php echo $this->lang->line('generated_by'); ?></th><td><?php echo $result->generated_by_name . " " . $result->generated_by_surname ?> (<?php echo $result->generated_by_employee_id ?>)</td>
+                            
+                        </tr>
+                    </table>
+                    <hr> 
+                    <?php
+                    if($result->symptoms !='' && trim($result->finding_description) != ''){
+$width = '50%';
+                    }else{
+                        
+$width = '100%';
+                    }
+                  ?>
+                    <table width="100%" class="printablea4">
+                        <tr>
+                            <?php if($result->symptoms !=''){ ?>
+                                <td width="<?php echo $width; ?>">
+                                    <b><?php echo $this->lang->line("symptoms"); ?></b>:<br><?php echo nl2br($result->symptoms)  ?>
+                                </td>
+                            <?php } ?>
+                            <?php if(trim($result->finding_description) != ''){ ?>
+                           
+                           <td width="<?php echo $width; ?>">                   
+                                <b><?php echo $this->lang->line("finding"); ?></b>:<br>
+                                <?php echo nl2br($result->finding_description); ?>
+                            </td>
+                            <?php }  ?>
+                        </tr>
+                    </table>
 
-                <div class="section-title">OTRAS ORDENES TERAPEUTICAS</div>
-                <div class="grid-2col-extra">
-                <?php 
-                    if (!empty($fields)) {
-                        foreach ($fields as $fields_key => $fields_value) {
-                            $display_field = $result_custom[$fields_value->name];
-                            if ($fields_value->visible_is_custom){?>
-                            <div><?php echo $fields_value->name; ?>: <span class="input-field-extra"><?php echo $display_field; ?></span></div>
-                    <?php }}
-                }?>
-                                            
-                    <!-- <div>DIETA: <span class="input-field-extra"></span></div> -->
-                    <!-- <div>CURAS: <span class="input-field-extra"></span></div> -->
-                    <!-- <div>OXIGENO: <span class="input-field-extra"></span></div> -->
-                    <!-- <div>IMÁGENES: <span class="input-field-extra"></span></div> -->
-                    <!-- <div>PROCEDIMIENTOS: <span class="input-field-extra"></span></div> -->
-                    <!-- <div>SONDAS Y DRENAJES: <span class="input-field-extra"></span></div> -->
-                    <!-- <div>CONTROLES HABITUALES: <span class="input-field-extra"></span></div> -->
-                    <!-- <div>CONTROLES ESPECIALES: <span class="input-field-extra"></span></div> -->
-                    <!-- <div>FISIOTERAPIA RESPIRATORIA: <span class="input-field-extra"></span></div> -->
-                    <!-- <div>ACTIVDAD FISICA/POSTURA: <span class="input-field-extra"></span></div> -->
+                    <?php if(trim($result->finding_description) !='' || $result->symptoms !=''){ ?>
+                      <hr style="height: 1px; clear: both;margin-bottom: 10px; margin-top: 10px" />
+                    <?php } ?>
+                    
+                    <table width="100%" class="printablea4">
+                        <tr>
+                            <td style="margin-bottom: 0;"><?php echo $result->header_note ?></td>
+                        </tr>
+                    </table>
+                    <hr style="height: 1px; clear: both;margin-bottom: 10px; margin-top:0px" />
+                     <?php if(!empty($result->medicines)){ ?>
+                    <h4><?php echo $this->lang->line("medicines"); ?></h4>
+                    <table class="table table-striped table-hover">                        
+                            <tr>
+                                <th width="2%" class="text text-left">#</th>
+                                <th width="13%" class="text text-left"><?php echo $this->lang->line("medicine_category"); ?></th>
+                                <th width="11%" class="text text-center"><?php echo $this->lang->line("medicine"); ?></th> 
+                                <th width="13%" class="text text-center"><?php echo $this->lang->line("dosage"); ?></th>
+                                <th width="13%" class="text text-center"><?php echo $this->lang->line("dose_interval"); ?></th>
+                                <th width="13%" class="text text-center"><?php echo $this->lang->line("dose_duration"); ?></th> 
+                                <th width="35%" class="text text-center"><?php echo $this->lang->line("instruction"); ?></th> 
+                            </tr>
+
+                        <?php $medsl =''; foreach ($result->medicines as $pkey => $pvalue) { $medsl++;
+                              ?>
+                            <tr>
+                                <td class="text text-left"><b><?php echo $medsl; ?></b></td>
+                                <td class="text text-left"><?php echo $pvalue->medicine_category; ?></td>
+                                <td class="text text-center"><?php echo $pvalue->medicine_name; ?></td>
+                                <td class="text text-center"><?php echo $pvalue->dosage." ".$pvalue->unit; ?></td>
+                                <td class="text text-center"><?php echo $pvalue->dose_interval_name; ?></td>
+                                <td class="text text-center"><?php echo $pvalue->dose_duration_name; ?></td>
+                                <td class="text text-center"><?php echo $pvalue->instruction; ?></td>
+                            </tr>  
+                        <?php } ?>
+                    </table> 
+                     <?php } ?>
+                    <?php if(!empty($result->tests)){ 
+
+                        $r=$p=0;
+                        foreach ($result->tests as $test_key => $test_value) {
+                            if($test_value->test_name != ""){
+                                $p=1;
+                            }
+                        }
+                        foreach ($result->tests as $test_key => $test_value) {
+                            if($test_value->radio_test_name != ""){
+                                $r=1;
+                            }
+                        }
+
+                        ?>    
+                    <table class="table table-striped table-hover">
+                        <tr>
+                            <?php 
+                            if($p==1){  ?>
+                                <th><?php echo $this->lang->line("pathology_test");  ?></th>
+                                <?php  }   ?>
+                            <?php  if($r==1){  ?>
+                                <th><?php echo $this->lang->line("radiology_test"); ?></th>
+                                <?php   }  ?>
+                           
+                        </tr>
+                        <tr>
+                           <?php if($p==1){ ?>
+                            <td width="50%"><?php $sl=''; foreach ($result->tests as $test_key => $test_value) {  ?>
+                                <table >   
+                                    <?php if($test_value->test_name != ""){ $sl++;?> <tr>
+                                    <td><?php echo "<b>".$sl.'</b>. '.$test_value->test_name." (".$test_value->short_name.")"; ?></td>   </tr>        
+                                    <?php } ?>                             
+                                </table>    
+                                <?php } ?>
+                            </td>
+                            <?php }
+                            if($r==1){
+                                ?>
+                            <td><?php $slradiology=''; foreach ($result->tests as $test_key => $test_value) {  ?>
+                                <table>   
+                                    <?php if($test_value->test_name == ""){ 
+                                    if($test_value->radio_test_name != ''){
+                                    $slradiology++;?> <tr>
+                                    <td><?php echo "<b>".$slradiology.'</b>. '.$test_value->radio_test_name." (".$test_value->radio_short_name.")"; ?></td> </tr>                                 
+                                    <?php } } ?>                             
+                                </table>   
+                                <?php } ?>
+                            </td>
+                            <?php } ?>
+                        </tr>
+                    </table>
+                    <?php } ?>          
+                    
+                    <hr style="height: 1px; clear: both;margin-bottom: 10px; margin-top: 10px" />
+                    <table width="100%" class="printablea4">
+                        <tr>
+                            <td><?php echo $result->footer_note; ?></td>
+                        </tr>
+                    </table>
+                    <hr style="height: 1px; clear: both;margin-bottom: 10px; margin-top:0px" />
+                    <table width="100%" class="printablea4">
+                        <tr>
+                            <td><?php
+                                if (!empty($print_details['print_footer'])) {
+                                    echo $print_details['print_footer'];
+                                }
+                                ?></td>
+                        </tr>   
+                    </table>
                 </div>
-                <?php if(!empty($result->footer_note)) {?>
-                    <div>
-                        <div class="section-title">Nota: </div>
-                        <?php echo $result->footer_note ?>
-                    </div>
-                <?php }?>
             </div>
-        
-            <div class="form-section">
-                <div class="section-title">FIRMAS</div>
-                <div class="grid-2col">
-                    <div>
-                        <div>NOMBRE Y FIRMA DEL MÉDICO:</div>
-                        <div class="signature-box"></div>
-                    </div>
-                    <div>
-                        <div>CÓDIGO:</div>
-                        <div class="signature-box"></div>
-                    </div>
-                </div>
-            </div>
+            <!--/.col (left) -->
         </div>
     </div>
-</body>
 </html>
+
 <script type="text/javascript">
      $('#edit_deleteprescription').html("<?php if ($this->rbac->hasPrivilege('prescription', 'can_view')) { ?><a href='#'' onclick='printprescription(<?php echo $id;?>)'  data-toggle='tooltip'  data-original-title='<?php echo $this->lang->line('print'); ?>'><i class='fa fa-print'></i></a><?php } ?><?php if ($this->rbac->hasPrivilege('prescription', 'can_edit')) { ?><a href='#'' onclick='edit_prescription(<?php echo $result->prescription_id;?>)' data-target='#edit_prescription' data-toggle='tooltip'  data-original-title='<?php echo $this->lang->line('edit'); ?>'><i class='fa fa-pencil'></i></a><?php } if ($this->rbac->hasPrivilege('prescription', 'can_delete')) { ?><a onclick='delete_prescription(<?php echo $result->prescription_id;?>)'  href='#'  data-toggle='tooltip'  data-original-title='<?php echo $this->lang->line('delete'); ?>'><i class='fa fa-trash'></i></a><?php } ?>");
  

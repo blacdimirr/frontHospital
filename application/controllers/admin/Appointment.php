@@ -44,10 +44,6 @@ class Appointment extends Admin_Controller
         $data['app_data']              = $app_data;
         $doctors                       = $this->staff_model->getStaffbyrole(3);
         $data["doctors"]               = $doctors;
-        //
-        $specialists                  = $this->staff_model->getSpecialist();
-        $data["specialists"]    = $specialists; 
-        //
         $patients                      = $this->patient_model->getPatientListall();
         $data["patients"]              = $patients;
         $data["appointment_status"]    = $this->appointment_status;
@@ -91,7 +87,7 @@ class Appointment extends Admin_Controller
         $this->form_validation->set_rules('doctorid', $this->lang->line('doctor'), 'trim|required|xss_clean');
         $this->form_validation->set_rules('amount', $this->lang->line('doctor_fees'), 'trim|required|xss_clean');
         $this->form_validation->set_rules('patient_id', $this->lang->line('patient'), 'trim|required|xss_clean');
-        // $this->form_validation->set_rules('global_shift', $this->lang->line('shift'), 'trim|required');
+        $this->form_validation->set_rules('global_shift', $this->lang->line('shift'), 'trim|required');
         $this->form_validation->set_rules('slot', $this->lang->line('slot'), 'trim|required|xss_clean');
         $this->form_validation->set_rules('appointment_status', $this->lang->line('status'), 'trim|required|xss_clean');
 
@@ -106,7 +102,7 @@ class Appointment extends Admin_Controller
                 'patient_id'         => form_error('patient_id'),
                 'doctor'             => form_error('doctorid'),
                 'amount'             => form_error('amount'),
-                // 'global_shift'       => form_error('global_shift'),
+                'global_shift'       => form_error('global_shift'),
                 'date'               => form_error('date'),
                 'slot'               => form_error('slot'),
                 'appointment_status' => form_error('appointment_status'),
@@ -138,7 +134,6 @@ class Appointment extends Admin_Controller
             $patient_id   = $this->input->post('patient_id');
             $consult      = $this->input->post('live_consult');
             $cheque_date  = $this->customlib->dateFormatToYYYYMMDD($this->input->post("cheque_date"));
-            $is_global_shift = $this->input->post('global_shift');
 
             $appointment = array(
                 'patient_id'         => $patient_id,
@@ -146,14 +141,12 @@ class Appointment extends Admin_Controller
                 'priority'           => $this->input->post('priority'),
                 'doctor'             => $this->input->post('doctorid'),
                 'message'            => $this->input->post('message'),
-                'global_shift_id'    => isset($is_global_shift) ? $is_global_shift : 1,
+                'global_shift_id'    => $this->input->post('global_shift'),
                 'shift_id'           => $this->input->post('slot'),
                 'is_queue'           => 0,
                 'live_consult'       => $consult,
                 'source'             => 'Offline',
                 'appointment_status' => $this->input->post('appointment_status'),
-                // 'appointment_status' => $this->input->post('appointment_status'),
-                'created_id'      => $this->customlib->getLoggedInUserID(),
             );
             $insert_id = $this->appointment_model->add($appointment);
 
@@ -245,7 +238,7 @@ class Appointment extends Admin_Controller
                     'zoom_api_secret' => "",
                 );
 
-                $title = 'Online consult for ' . $this->customlib->getSessionPrefixByType('DAR-FO') . $visit_detail->opd_details_id . " Checkup ID " . $visit_detail->id;
+                $title = 'Online consult for ' . $this->customlib->getSessionPrefixByType('opd_no') . $visit_detail->opd_details_id . " Checkup ID " . $visit_detail->id;
                 $this->load->library('zoom_api', $params);
                 $insert_array = array(
                     'staff_id'         => $this->input->post('doctorid'),
@@ -566,7 +559,7 @@ class Appointment extends Admin_Controller
                 $row[] = $value->source;
                 $row[] = $value->priorityname;
                 if ($this->module_lib->hasActive('live_consultation')) {
-                    // $row[] = $live_consult;
+                    $row[] = $live_consult;
                 }
                 //====================
                 if (!empty($fields)) {
@@ -579,7 +572,7 @@ class Appointment extends Admin_Controller
                     }
                 }
                 //====================
-                // $row[]     = $value->paid_amount;
+                $row[]     = $value->paid_amount;
                 $row[]     = "<small " . $label . ">" . $this->lang->line($value->appointment_status) . "</small>";
                 $dt_data[] = $row;
             }
@@ -848,8 +841,6 @@ This Function is Used to move patient from appointment to other module
                 'shift'            => $this->input->post('shift'),
                 'priority'         => $this->input->post('priority'),
                 'appointment_type' => $this->input->post('appointment_type'),
-                'created_id'       => $this->input->post('created_id'),
-                'nationality'       => $this->input->post('nationality'),
             );
 
             $json_array = array('status' => 'success', 'error' => '', 'param' => $param, 'message' => $this->lang->line('success_message'));
@@ -861,12 +852,6 @@ This Function is Used to move patient from appointment to other module
     {
         $this->session->set_userdata('top_menu', 'Reports');
         $this->session->set_userdata('sub_menu', 'admin/appointment/appointmentreport');
-
-        $userslist                    = $this->staff_model->getEmployeeByRoleID(8);
-        $data['userslist']            = $userslist;
-        $nationality_array          = $this->staff_model->getNationalities();
-        $data["nationality_array"]  = $nationality_array;
-
         $doctorlist                    = $this->staff_model->getEmployeeByRoleID(3);
         $data['doctorlist']            = $doctorlist;
         $custom_fields                 = $this->customfield_model->get_custom_fields('appointment', '', '', 1);
@@ -888,8 +873,6 @@ This Function is Used to move patient from appointment to other module
         $shift                   = $this->input->post('shift');
         $priority                = $this->input->post('priority');
         $appointment_type        = $this->input->post('appointment_type');
-        $search['created_id']    = $this->input->post('created_id');
-        $search['nationality']    = $this->input->post('nationality');
         $start_date              = '';
         $end_date                = '';
         $fields                  = $this->customfield_model->get_custom_fields('appointment', '', '', 1);
@@ -910,9 +893,9 @@ This Function is Used to move patient from appointment to other module
 
             $start_date = $dates['from_date'];
             $end_date   = $dates['to_date'];
-        } 
+        }
 
-        $reportdata  = $this->report_model->appointmentRecord($start_date, $end_date, $search['collect_staff'], $shift, $priority, $appointment_type,$search['created_id'],$search['nationality']);
+        $reportdata  = $this->report_model->appointmentRecord($start_date, $end_date, $search['collect_staff'], $shift, $priority, $appointment_type);
         $reportdata  = json_decode($reportdata);
         $dt_data     = array();
         $paid_amount = 0;
@@ -949,17 +932,10 @@ This Function is Used to move patient from appointment to other module
                 }
                 //====================
                 $row[]     = $value->paid_amount;
-                $row[]     = $value->nationality;
                 $row[]     = "<small " . $label . " >" . $this->lang->line($value->appointment_status) . "</small>";
                 $dt_data[] = $row;
             }
-
-            // print_r($dt_data);
-            // die;
-          
-
             $footer_row   = array();
-            $footer_row[] = "";
             $footer_row[] = "";
             $footer_row[] = "";
             $footer_row[] = "";
@@ -976,8 +952,6 @@ This Function is Used to move patient from appointment to other module
             $footer_row[] = "";
             $dt_data[]    = $footer_row;
         }
-
-        
 
         $json_data = array(
             "draw"            => intval($reportdata->draw),
@@ -1152,7 +1126,7 @@ This Function is Used to move patient from appointment to other module
                     'zoom_api_secret' => "",
                 );
 
-                $title = 'Online consult for ' . $this->customlib->getSessionPrefixByType('DAR-FO') . $visit_detail->opd_details_id . " Checkup ID " . $visit_detail->id;
+                $title = 'Online consult for ' . $this->customlib->getSessionPrefixByType('opd_no') . $visit_detail->opd_details_id . " Checkup ID " . $visit_detail->id;
                 $this->load->library('zoom_api', $params);
                 $insert_array = array(
                     'staff_id'         => $appointment_details['doctor'],

@@ -452,26 +452,6 @@ class Patient_model extends MY_Model
          
     }
 
-    public function add_symptoms_type($data){        
-        // if (isset($data['id']) && $data['id'] != '') {
-            $this->db->where('visit_details_id', $data[0]['visit_details_id'])
-            ->delete('sintomas');           
-        // } else {
-        foreach($data as $item){           
-            $data_ = array(
-                'visit_details_id'  => $item['visit_details_id'],
-                'symptoms_type_id'  => $item['symptoms_type_id']
-            );
-            $this->db->insert('sintomas', $data_);
-            $this->db->insert_id();
-        }
-    }
-
-    public function get_symptoms_type($visit_details_id){
-        $query = $this->db->where("visit_details_id", $visit_details_id)->get("sintomas");
-        return $query->result_array();        
-    }
-
     public function add_visit_recheckup($opd_visit_data, $transcation_data, $charge)
     {
         $this->db->trans_start(); # Starting Transaction
@@ -690,16 +670,11 @@ class Patient_model extends MY_Model
  
     public function add_discharge($data)
     {
+
         if (!empty($data['ipd_details_id'])) {
-            // print_r(!empty($data['ipd_details_id']));
-            // die();
             $status = array('discharged' => 'yes');
-            $bed=$this->db->select('bed')
-            ->from('ipd_details')
-            ->where('id',$data['ipd_details_id'])->get()->row_array();
+            $bed=$this->db->select('bed')->from('ipd_details')->where('id',$data['ipd_details_id'])->get()->row_array();
             $bed_status=array('is_active'=>'yes');
-
-
             $this->db->where('id', $bed['bed']);
             $this->db->update('bed', $bed_status);
             $this->db->where('id', $data['ipd_details_id']);
@@ -708,8 +683,6 @@ class Patient_model extends MY_Model
             $this->db->update('bed', $bed_status);
         }  
 
-            // print_r(!empty($data['ipd_details_id']));
-            // die();
         if (!empty($data['opd_details_id'])) {
             $opd_status = array('discharged' => 'yes');
             $this->db->where('id', $data['opd_details_id']);
@@ -1228,6 +1201,7 @@ class Patient_model extends MY_Model
 
     public function getAllopdRecord()
     {
+
         $setting            = $this->setting_model->get();
         $opd_month          = $setting[0]['opd_record_month'];
         $userdata           = $this->customlib->getUserData();
@@ -1235,7 +1209,6 @@ class Patient_model extends MY_Model
        
         $i                         = 1;
         $custom_fields             = $this->customfield_model->get_custom_fields('opd', 1);
-        
         // $custom_field_column_array = array();
         // $field_var_array = array();
         // if (!empty($custom_fields)) {
@@ -1248,6 +1221,8 @@ class Patient_model extends MY_Model
         //     }
         // }
 
+
+
         // $field_variable = (empty($field_var_array))? "": ",".implode(',', $field_var_array);
         // $custom_field_column = (empty($custom_field_column_array))? "": ",".implode(',', $custom_field_column_array);
         //  if ($doctor_restriction == 'enabled') {
@@ -1258,7 +1233,6 @@ class Patient_model extends MY_Model
 
         $custom_field_column_array = array();
         $field_var_array = array();
-
        if (!empty($custom_fields)) {
             foreach ($custom_fields as $custom_fields_key => $custom_fields_value) {
                 $tb_counter = "table_custom_" . $i;
@@ -1271,111 +1245,20 @@ class Patient_model extends MY_Model
 
         $field_variable = (empty($field_var_array))? "": ",".implode(',', $field_var_array);
         $custom_field_column = (empty($custom_field_column_array))? "": ",".implode(',', $custom_field_column_array);
-
-        $id_staff = 0;
-        $id_staff = $this->getStaffbyrole(9);
-        $ids = array();
-        
-        foreach ($id_staff as $key => $value) {
-            $ids [] =  $value['id'];
-        }
-
-        // $ids_string = implode(',',$ids);
-
-        // print_r($field_var_array);
-        // die();
-        
         $this->datatables
-        ->select('opd_details.id as opdid,opd_details.case_reference_id,patients.id as pid,count(opd_details.patient_id) as total_visit,max(visit_details.appointment_date) as last_visit,patients.patient_name,patients.id as patientid,0 is_hospitalized,patients.guardian_name,patients.gender,patients.mobileno,patients.is_ipd,staff.name,staff.surname,staff.employee_id'. $field_variable )
-        ->join('visit_details', "opd_details.id=visit_details.opd_details_id", "LEFT")
-        ->join('patients', "patients.id=opd_details.patient_id", "LEFT")
-        ->join('staff', 'staff.id = visit_details.cons_doctor', "LEFT")
-        ->searchable('patients.patient_name,patients.id,patients.guardian_name,patients.gender,patients.mobileno,staff.name'. $custom_field_column)
-        ->orderable('patients.patient_name,patients.id,patients.guardian_name,patients.gender,patients.mobileno,staff.name'. $custom_field_column.',MAX(visit_details.appointment_date)')
-        ->sort('max(visit_details.appointment_date)', 'desc')            
-        ->group_by('patients.id')
-        ->from('opd_details');
-        // if($userdata["role_id"] == 7) {
-        //     $this->datatables->where_in('opd_details.generated_by',$ids);
-        // }
-
-        // if($userdata["role_id"] == 11) {
-        //     $id_staff = $this->staff_model->getStaffbyrole(11);
-        //     $this->datatables->where_in('opd_details.generated_by',$ids);
-        // }
+            ->select('opd_details.id as opdid,opd_details.case_reference_id,patients.id as pid,count(opd_details.patient_id) as total_visit,max(visit_details.appointment_date) as last_visit,patients.patient_name,patients.id as patientid,patients.guardian_name,patients.gender,patients.mobileno,patients.is_ipd,staff.name,staff.surname,staff.employee_id'. $field_variable )
+            ->join('visit_details', "opd_details.id=visit_details.opd_details_id", "LEFT")
+            ->join('patients', "patients.id=opd_details.patient_id", "LEFT")
+            ->join('staff', 'staff.id = visit_details.cons_doctor', "LEFT")
+            ->searchable('patients.patient_name,patients.id,patients.guardian_name,patients.gender,patients.mobileno,staff.name'. $custom_field_column)
+            ->orderable('patients.patient_name,patients.id,patients.guardian_name,patients.gender,patients.mobileno,staff.name'. $custom_field_column.',MAX(visit_details.appointment_date)')
+            ->sort('max(visit_details.appointment_date)', 'desc')
+            
+            ->group_by('patients.id')
+            ->from('opd_details');
 
         return $this->datatables->generate('json');
 
-    }
-
-    public function is_hospitalized($id)
-    {        
-        $this->db     
-        ->select('COUNT(1) cantidad_veces ')
-        ->where('ipd_details.patient_id',$id)
-        ->where('ipd_details.discharged','no')
-        ->from('ipd_details');
-
-        $query = $this->db->get();
-
-        $cantidad_veces = $query->result_array()[0]['cantidad_veces'];
-
-        $result = '';
-        if ($cantidad_veces == 0){
-            $result = 'No';
-        } else {
-            $result = 'Yes';
-        }
-
-        return $result;
-    }
-    
-    public function get_opd_detail_id($patient_id)
-    {
-        $this->db     
-        ->select('opd_details.case_reference_id')
-        ->where('opd_details.patient_id',$patient_id)
-        ->from('opd_details')
-        ->order_by('opd_details.id', 'desc');
-
-        $query = $this->db->get();
-
-        $result = $query->result_array()[0]['case_reference_id'];
-
-        return $result;
-    }
-
-    public function get_case_reference_id($case_reference_id)
-    {
-        $this->db     
-        ->select('referencia_cama_chequeo.case_reference_id,referencia_cama_chequeo.cama,referencia_cama_chequeo.grupo_cama')
-        ->where('referencia_cama_chequeo.case_reference_id',$case_reference_id)
-        ->from('referencia_cama_chequeo');
-
-        $query = $this->db->get();
-        
-        if(empty($query->result_array())){
-            $result = array();
-        } else {
-            $result = $query->result_array()[0];
-        }
-
-        return $result;
-    }
-
-    private function getStaffbyrole($id)
-    {
-        $this->db->select('staff.id,staff.name,staff.surname,staff.employee_id,staff_designation.designation as designation,staff_roles.role_id, department.department_name as department,roles.name as user_type');
-        $this->db->join("staff_designation", "staff_designation.id = staff.staff_designation_id", "left");
-        $this->db->join("department", "department.id = staff.department_id", "left");
-        $this->db->join("staff_roles", "staff_roles.staff_id = staff.id", "left");
-        $this->db->join("roles", "staff_roles.role_id = roles.id", "left");
-        $this->db->where("staff_roles.role_id", $id);
-        $this->db->where("staff.is_active", "1");
-        $this->db->order_by("staff.name", 'asc');
-        $this->db->from('staff');
-        $query = $this->db->get();
-        return $query->result_array();
     }
 
     public function getalldischargeopdRecord()
@@ -1606,7 +1489,7 @@ class Patient_model extends MY_Model
     public function getVisitsByOPDid($opdid)
     {
     
-        $this->db->select('visit_details.*,organisation.organisation_name,opd_details.id as opdid,opd_details.case_reference_id,opd_details.patient_id,patients.patient_name,patients.id as patient_id,patients.age,patients.month,patients.day,patients.dob,patients.guardian_name,patients.gender,patients.marital_status,patients.mobileno,patients.email,patients.address,patients.insurance_id,patients.insurance_validity,patients.identification_number,patients.known_allergies,patients.image as patient_image,patients.nationality,blood_bank_products.name as blood_group_name,staff.name,staff.surname,staff.employee_id,patients.id as `patient_id`')->from('visit_details');
+  $this->db->select('visit_details.*,organisation.organisation_name,opd_details.id as opdid,opd_details.case_reference_id,opd_details.patient_id,patients.patient_name,patients.id as patient_id,patients.age,patients.month,patients.day,patients.dob,patients.guardian_name,patients.gender,patients.marital_status,patients.mobileno,patients.email,patients.address,patients.insurance_id,patients.insurance_validity,patients.identification_number,patients.known_allergies,patients.image as patient_image,blood_bank_products.name as blood_group_name,staff.name,staff.surname,staff.employee_id,patients.id as `patient_id`')->from('visit_details');
         $this->db->join('opd_details', 'opd_details.id = visit_details.opd_details_id');
         $this->db->join('patients', 'patients.id = opd_details.patient_id');
         $this->db->join('blood_bank_products', 'blood_bank_products.id = patients.blood_bank_product_id','left');
@@ -1621,7 +1504,7 @@ class Patient_model extends MY_Model
 
     public function getVisitDetailsbyopdid($opdid)
     {
-        $this->db->select('visit_details.*,appointment.id as appointment_no,appointment_queue.position as appointment_serial_no,department.department_name as department_name,organisation.organisation_name,opd_details.id as opdid,opd_details.case_reference_id,opd_details.patient_id,patients.patient_name,patients.id as patient_id,patients.age,patients.month,patients.day,patients.dob,patients.guardian_name,patients.gender,patients.marital_status,patients.mobileno,patients.email,patients.address,patients.insurance_id,patients.insurance_validity,patients.identification_number,patients.known_allergies,patients.image as patient_image,blood_bank_products.name as blood_group_name,staff.name,staff.surname,staff.employee_id,patients.id as `patient_id`,patients.identification_number,patients.nationality,patients.marital_status,patients.insurance_id')->from('visit_details');
+        $this->db->select('visit_details.*,appointment.id as appointment_no,appointment_queue.position as appointment_serial_no,department.department_name as department_name,organisation.organisation_name,opd_details.id as opdid,opd_details.case_reference_id,opd_details.patient_id,patients.patient_name,patients.id as patient_id,patients.age,patients.month,patients.day,patients.dob,patients.guardian_name,patients.gender,patients.marital_status,patients.mobileno,patients.email,patients.address,patients.insurance_id,patients.insurance_validity,patients.identification_number,patients.known_allergies,patients.image as patient_image,blood_bank_products.name as blood_group_name,staff.name,staff.surname,staff.employee_id,patients.id as `patient_id`')->from('visit_details');
         $this->db->join('opd_details', 'opd_details.id = visit_details.opd_details_id');
         $this->db->join('patients', 'patients.id = opd_details.patient_id');
         $this->db->join('blood_bank_products', 'blood_bank_products.id = patients.blood_bank_product_id','left');
@@ -1659,31 +1542,6 @@ class Patient_model extends MY_Model
         $this->db->join('organisation', 'organisation.id = visit_details.organisation_id', 'left');
         $this->db->where('visit_details.id', $visitid);
         $query  = $this->db->get();
-        $result = $query->row_array();
-        return $result;
-    }
-
-    public function getcustomField($id)
-    {
-        $i               = 1;
-        $custom_fields   = $this->customfield_model->get_custom_fields('ipd','','','', '');
-        $field_var_array = array();
-        if (!empty($custom_fields)) {
-            foreach ($custom_fields as $custom_fields_key => $custom_fields_value) {
-                $tb_counter = "table_custom_" . $i;
-                array_push($field_var_array, 'table_custom_' . $i . '.field_value as ' . $custom_fields_value->name);
-                $this->db->join('custom_field_values as ' . $tb_counter, 'ipd_details.id = ' . $tb_counter . '.belong_table_id AND ' . $tb_counter . '.custom_field_id = ' . $custom_fields_value->id, 'left');
-                $i++;
-            }
-        }
-        $field_variable = implode(',', $field_var_array);
-
-        $this->db->select('patients.patient_name,patients.id as patient_id,patients.age,patients.month,patients.day,patients.dob,patients.guardian_name,patients.gender,patients.marital_status,patients.mobileno,patients.email,patients.address,patients.insurance_id,patients.insurance_validity,patients.identification_number,patients.known_allergies,patients.image as patient_image,staff.name,staff.surname,staff.employee_id,patients.id as `patient_id`,' . $field_variable)->from('ipd_details');
-        $this->db->join('patients', 'patients.id = ipd_details.patient_id');
-        $this->db->join('staff', 'staff.id = ipd_details.cons_doctor');
-        $this->db->where('ipd_details.id', $id);
-        $query  = $this->db->get();
-
         $result = $query->row_array();
         return $result;
     }
@@ -2596,93 +2454,6 @@ class Patient_model extends MY_Model
         }
     }
 
-    public function add_admission_note($data)
-    {
-        if (isset($data['id'])) {
-            $this->db->where('id', $data['id']);
-            $this->db->update('admission_note', $data);
-        } else {
-            $this->db->insert('admission_note', $data);
-            return $this->db->insert_id();
-        }
-    }
-
-    public function add_description_comment($data)
-    {
-        if (isset($data['id'])) {
-            $this->db->where('id', $data['id']);
-            $this->db->update('description_comment', $data);
-        } else {
-            $this->db->insert('description_comment', $data);
-            return $this->db->insert_id();
-        }
-    }
-
-    public function add_admission_diagnosis($data)
-    {
-        if (isset($data['id'])) {
-            $this->db->where('id', $data['id']);
-            $this->db->update('hoja_diagnostico_ingreso', $data);
-        } else {
-            $this->db->insert('hoja_diagnostico_ingreso', $data);
-            return $this->db->insert_id();
-        }
-    }
-
-    public function updateAdmissionDiagnosis($data)
-    {
-        $this->db->update("hoja_diagnostico_ingreso", $data, array("id" => $data['id']));
-    }
-
-    public function getDiagnosticosIngresosByVisitID($visitid)
-    {
-        $query = $this->db->select("opd_details.*,visit_details.id as visitid,visit_details.known_allergies as any_allergies,visit_details.weight,visit_details.height,visit_details.pulse,
-        visit_details.temperature,visit_details.symptoms,visit_details.bp,patients.*,blood_bank_products.name as blood_group_name,staff.name,staff.surname,staff.employee_id,staff.local_address,
-        hoja_diagnostico_ingreso.diagnosticos,hoja_diagnostico_ingreso.search, hoja_diagnostico_ingreso.created_at presdate, hoja_diagnostico_ingreso.diagnosticos_text, hoja_diagnostico_ingreso.id diagnosticos_id,
-        prescription_generate.name as generated_by_name,prescription_generate.surname as generated_by_surname,prescription_generate.employee_id as generated_by_employee_id,prescribe_by.name as prescribe_by_name,prescribe_by.surname as prescribe_by_surname,prescribe_by.employee_id as prescribe_by_employee_id, opd_details.id as opd_detail_id,staff.employee_id as doctor_id");
-        $this->db->join("visit_details", "visit_details.id = hoja_diagnostico_ingreso.visit_details_id","left");
-        $this->db->join("opd_details", "opd_details.id = visit_details.opd_details_id");
-        $this->db->join("patients", "patients.id = opd_details.patient_id");
-        $this->db->join('blood_bank_products', 'blood_bank_products.id = patients.blood_bank_product_id',"left");
-        $this->db->join("staff", "staff.id = visit_details.cons_doctor");
-        $this->db->join("staff as prescription_generate", "prescription_generate.id = hoja_diagnostico_ingreso.generated_by");
-        $this->db->join("staff as prescribe_by", "prescribe_by.id = hoja_diagnostico_ingreso.generated_by");
-        $this->db->where("hoja_diagnostico_ingreso.visit_details_id", $visitid)
-        ->where("hoja_diagnostico_ingreso.deleted", 0);
-        $query = $this->db->get("hoja_diagnostico_ingreso");
-
-        if ($query->num_rows() > 0) {
-            $result            = $query->result_array();
-            return $result;
-
-        }
-        return false;
-    }
-    public function getDiagnosticosIngresosByID($visitid)
-    {
-        $query = $this->db->select("opd_details.*,visit_details.id as visitid,visit_details.known_allergies as any_allergies,visit_details.weight,visit_details.height,visit_details.pulse,
-        visit_details.temperature,visit_details.symptoms,visit_details.bp,patients.*,blood_bank_products.name as blood_group_name,staff.name,staff.surname,staff.employee_id,staff.local_address,
-        hoja_diagnostico_ingreso.diagnosticos,hoja_diagnostico_ingreso.search, hoja_diagnostico_ingreso.created_at presdate, hoja_diagnostico_ingreso.diagnosticos_text, hoja_diagnostico_ingreso.id diagnosticos_id,
-        prescription_generate.name as generated_by_name,prescription_generate.surname as generated_by_surname,prescription_generate.employee_id as generated_by_employee_id,prescribe_by.name as prescribe_by_name,prescribe_by.surname as prescribe_by_surname,prescribe_by.employee_id as prescribe_by_employee_id, opd_details.id as opd_detail_id,staff.employee_id as doctor_id");
-        $this->db->join("visit_details", "visit_details.id = hoja_diagnostico_ingreso.visit_details_id","left");
-        $this->db->join("opd_details", "opd_details.id = visit_details.opd_details_id");
-        $this->db->join("patients", "patients.id = opd_details.patient_id");
-        $this->db->join('blood_bank_products', 'blood_bank_products.id = patients.blood_bank_product_id',"left");
-        $this->db->join("staff", "staff.id = visit_details.cons_doctor");
-        $this->db->join("staff as prescription_generate", "prescription_generate.id = hoja_diagnostico_ingreso.generated_by");
-        $this->db->join("staff as prescribe_by", "prescribe_by.id = hoja_diagnostico_ingreso.generated_by");
-        $this->db->where("hoja_diagnostico_ingreso.id", $visitid)
-        ->where("hoja_diagnostico_ingreso.deleted", 0);
-        $query = $this->db->get("hoja_diagnostico_ingreso");
-
-        if ($query->num_rows() > 0) {
-            $result            = $query->result_array();
-            return $result;
-
-        }
-        return false;
-    }
-
     public function add_nursenotecomment($data)
     {
         if (isset($data['id'])) {
@@ -2708,18 +2479,6 @@ class Patient_model extends MY_Model
 
         $this->deletecommentnursenote($id, $ipdid);
         $this->customfield_model->delete_custom_fieldRecord($id,'ipdnursenote'); 
-    }
-
-    public function deleteIpd_admission_note($id, $ipdid)
-    {
-        $query = $this->db->where('id', $id)
-            ->delete('admission_note');
-    }
-
-    public function delete_description_comment($id, $ipdid)
-    {
-        $query = $this->db->where('id', $id)
-            ->delete('description_comment');
     }
 
     public function deletecommentnursenote($id, $ipdid)
@@ -2775,61 +2534,6 @@ class Patient_model extends MY_Model
 
         return $result;
     }
-
-    public function get_data_admission_note($id, $ipdid)
-    {
-        $i             = 1;
-        // $custom_fields = $this->customfield_model->get_custom_fields('ipdnursenote', 1);
-
-        // $field_var_array = array();
-        // if (!empty($custom_fields)) {
-        //     foreach ($custom_fields as $custom_fields_key => $custom_fields_value) {
-        //         $tb_counter = "table_custom_" . $i;
-        //         array_push($field_var_array, 'table_custom_' . $i . '.field_value as ' . $custom_fields_value->name);
-        //         $this->db->join('custom_field_values as ' . $tb_counter, 'nurse_note.id = ' . $tb_counter . '.belong_table_id AND ' . $tb_counter . '.custom_field_id = ' . $custom_fields_value->id, 'left');
-        //         $i++;
-        //     }
-        // }
-        // $field_variable = implode(',', $field_var_array);
-        $query          = $this->db->select('admission_note.*,staff.name,staff.surname,staff.employee_id' )
-        ->join('staff', 'staff.id = admission_note.staff_id', "LEFT")
-        ->where("admission_note.ipd_id", $ipdid)
-        ->get("admission_note");
-        $result         = $query->result_array();
-
-        return $result;
-    }
-
-    public function get_data_type_description($id = null)
-    {
-        $query = $this->db->select('type_description.*' )
-        ->order_by('type_description.type_description_name', "ASC")
-        ->get("type_description");
-
-        if($id != null){
-            $query = $this->db->select('type_description.*' )
-            // ->order_by('type_description.type_description_name', "ASC")
-            ->where("type_description.id", $id)
-            ->get("type_description");
-        }
-
-        $result = $query->result_array();
-
-        return $result;
-    }
-
-    public function get_data_description_comment($id, $ipdid)
-    {
-        $query = $this->db->select('description_comment.*,staff.name,staff.surname,staff.employee_id,type_description.type_description_name' )
-        ->join('staff', 'staff.id = description_comment.staff_id', "LEFT")
-        ->join('type_description', 'type_description.id = description_comment.type_description_id', "LEFT")
-        ->where("description_comment.ipd_id", $ipdid)
-        ->get("description_comment");
-        $result = $query->result_array();
-
-        return $result;
-    }
-
     public function getmedicationdetailsbydate_overview($ipdid){
        $query = $this->db->select("medication_report.*,pharmacy.medicine_name,medicine_dosage.dosage as medicine_dosage,charge_units.unit")
             ->join('pharmacy', 'pharmacy.id = medication_report.pharmacy_id', 'left')
@@ -2837,20 +2541,6 @@ class Patient_model extends MY_Model
             ->join('charge_units', 'medicine_dosage.charge_units_id = charge_units.id', 'left')
             ->where("medication_report.ipd_id", $ipdid)
             ->get("medication_report");
-
-       return $result_medication = $query->result_array();
-    }
-
-    public function getmedicationdetailsbydate_overview_2($ipdid){
-       $query = $this->db->select("medication_report.*,pharmacy.medicine_name,medicine_dosage.dosage as medicine_dosage,charge_units.unit")
-       ->join('opd_details', 'opd_details.case_reference_id = ipd_details.case_reference_id', 'join')
-       ->join('medication_report', 'medication_report.opd_details_id = opd_details.id', 'join')
-       // ->join('ipd_details', 'ipd_details.id = medication_report.ipd_id', 'join')
-       ->join('pharmacy', 'pharmacy.id = medication_report.pharmacy_id', 'left')
-       ->join('medicine_dosage', 'medicine_dosage.id = medication_report.medicine_dosage_id', 'left')
-       ->join('charge_units', 'medicine_dosage.charge_units_id = charge_units.id', 'left')
-            ->where("ipd_details.id", $ipdid)
-            ->get("ipd_details");
 
        return $result_medication = $query->result_array();
     }
@@ -3381,7 +3071,7 @@ class Patient_model extends MY_Model
         return $result["amount"];
     }
 
-    public function getOTEarning($search = array())
+    public function getOTEarning($search = '')
     {
         $search_arr = array();
         foreach ($search as $key => $value) {
@@ -3892,8 +3582,6 @@ class Patient_model extends MY_Model
             $patient_details['bed_id'] =$ipd_details['bed_id'];
             $patient_details['bedgroup_name'] =$ipd_details['bedgroup_name'];
             $patient_details['floor_name'] =$ipd_details['floor_name'];
-            $patient_details['identification_number'] =$ipd_details['identification_number'];
-            $patient_details['weight'] =$ipd_details['weight'];
 
        }else{
             $patient_details['ipdid'] ='';
@@ -3913,8 +3601,6 @@ class Patient_model extends MY_Model
             $patient_details['age'] = '';
             $patient_details['month'] = '';
             $patient_details['day'] = '';
-            $patient_details['identification_number'] = '';
-            $patient_details['weight'] = '';
        }
 
        if(!empty($opd_details)){
@@ -3938,8 +3624,7 @@ class Patient_model extends MY_Model
             $patient_details['opdid'] =$opd_details['opdid'];
             $patient_details['discharged'] =$opd_details['discharged'];
             $patient_details['appointment_date'] =$opd_details['appointment_date'];
-            $patient_details['date'] =$opd_details['appointment_date'];
-            $patient_details['identification_number'] =$opd_details['identification_number'];
+             $patient_details['date'] =$opd_details['appointment_date'];
 
        }else{
             $patient_details['opdid'] ='';
@@ -3954,7 +3639,7 @@ class Patient_model extends MY_Model
 
     public function getDetailsopdByCaseId($case_id)
     {
-        return $this->db->select('patients.id as patient_id,patients.patient_name,patients.dob,patients.age,patients.month,patients.day,patients.image,patients.mobileno,patients.email,patients.gender,patients.blood_group,patients.address,patients.guardian_name,patients.is_dead,patients.insurance_id,patients.insurance_validity,opd_details.id as opdid,opd_details.discharged,visit_details.appointment_date, patients.identification_number, visit_details.weight,visit_details.height,visit_details.opd_details_id,')->from('patients')
+        return $this->db->select('patients.id as patient_id,patients.patient_name,patients.dob,patients.age,patients.month,patients.day,patients.image,patients.mobileno,patients.email,patients.gender,patients.blood_group,patients.address,patients.guardian_name,patients.is_dead,patients.insurance_id,patients.insurance_validity,opd_details.id as opdid,opd_details.discharged,visit_details.appointment_date,')->from('patients')
             ->join('opd_details', 'opd_details.patient_id=patients.id', 'inner')
             ->join('visit_details', 'visit_details.opd_details_id=opd_details.id', 'inner')
             ->where('opd_details.case_reference_id', $case_id)
@@ -3964,13 +3649,11 @@ class Patient_model extends MY_Model
 
      public function getDetailsipdByCaseId($case_id)
     {
-        return $this->db->select('patients.id as patient_id,patients.patient_name,patients.dob,patients.age,patients.month,patients.day,patients.image,patients.mobileno,patients.email,patients.gender,patients.blood_group,patients.address,patients.guardian_name,patients.is_dead,patients.insurance_id,patients.insurance_validity,ipd_details.id as ipdid,`ipd_details`.`date`,ipd_details.discharged,ipd_details.credit_limit,ipd_details.date,bed.name as bed_name,bed.id as bed_id,bed_group.name as bedgroup_name,floor.name as floor_name, patients.identification_number, visit_details.weight')->from('patients')
+        return $this->db->select('patients.id as patient_id,patients.patient_name,patients.dob,patients.age,patients.month,patients.day,patients.image,patients.mobileno,patients.email,patients.gender,patients.blood_group,patients.address,patients.guardian_name,patients.is_dead,patients.insurance_id,patients.insurance_validity,ipd_details.id as ipdid,`ipd_details`.`date`,ipd_details.discharged,ipd_details.credit_limit,ipd_details.date,bed.name as bed_name,bed.id as bed_id,bed_group.name as bedgroup_name,floor.name as floor_name')->from('patients')
             ->join('ipd_details', 'ipd_details.patient_id=patients.id', 'inner')
             ->join('bed', 'ipd_details.bed = bed.id', "left")
             ->join('bed_group', 'ipd_details.bed_group_id = bed_group.id', "left")
             ->join('floor', 'floor.id = bed_group.floor', "left")
-            ->join('opd_details', 'opd_details.patient_id=patients.id', 'left')
-            ->join('visit_details', 'visit_details.opd_details_id=opd_details.id', 'left')
             ->where('ipd_details.case_reference_id', $case_id)
             ->get()
             ->row_array();
@@ -3999,8 +3682,6 @@ class Patient_model extends MY_Model
             ->group_start()
             ->where("id", $search_term)
             ->or_like("patient_name", $search_term)
-            ->or_like("mobileno", $search_term)
-            ->or_like("identification_number", $search_term)
             ->group_end()
             ->where("is_active","yes")
             ->where("is_dead!=","yes")
@@ -4778,46 +4459,6 @@ class Patient_model extends MY_Model
         $query = $this->db->get();
         $result = $query->result_array();
         return $result ;
-    }
-
-    public function getVisitsBycaseId($id)
-    {
-    
-        $this->db->select('visit_details.*,hoja_ingreso.antecedentes_personales,
-        hoja_ingreso.antecedentes_familiar,
-        hoja_ingreso.esquema_inmunizacion,
-        hoja_ingreso.examen_fisico,
-        hoja_ingreso.signos_vitales,
-        hoja_ingreso.resumen_clinico,
-        hoja_ingreso.tratamiento,
-        hoja_ingreso.admitting_diagnosis,
-        hoja_ingreso.diagnostico
-        ')->from('visit_details');
-        $this->db->join('hoja_ingreso', 'hoja_ingreso.visit_details_id = visit_details.id');
-        // $this->db->join('patients', 'patients.id = opd_details.patient_id');
-        // $this->db->join('blood_bank_products', 'blood_bank_products.id = patients.blood_bank_product_id','left');
-        // $this->db->join('staff', 'staff.id = visit_details.cons_doctor');
-        // $this->db->join('organisation', 'organisation.id = visit_details.organisation_id', 'left');
-        $this->db->where('visit_details.patient_charge_id', $id);
-        $query  = $this->db->get();
-        $result = $query->result_array();
-        return $result;
-
-    }
-
-    public function getOpdOrIdpByVisits($transaction_id)
-    {
-        $this->db->select('visit_details.*,visit_details.known_allergies as visit_known_allergies, opd_details.id as opdid,opd_details.case_reference_id,opd_details.patient_id,patients.patient_name,patients.id as patient_id,patients.age,patients.month,patients.day,patients.dob,patients.guardian_name,patients.gender,patients.marital_status,patients.mobileno,patients.email,patients.address,patients.insurance_id,patients.insurance_validity,patients.identification_number,patients.known_allergies,patients.image as patient_image,staff.name,staff.surname,staff.employee_id,patients.id as `patient_id`')->from('visit_details');
-        $this->db->join('opd_details', 'opd_details.id = visit_details.opd_details_id');
-        $this->db->join('patients', 'patients.id = opd_details.patient_id');
-        // $this->db->join('blood_bank_products', 'blood_bank_products.id = patients.blood_bank_product_id','left');
-        $this->db->join('staff', 'staff.id = visit_details.cons_doctor');
-        // $this->db->join('transactions', 'transactions.id = visit_details.transaction_id',"left");
-        // $this->db->join('organisation', 'organisation.id = visit_details.organisation_id', 'left');
-        $this->db->where('visit_details.patient_charge_id', $transaction_id);
-        $query  = $this->db->get();
-        $result = $query->row_array();
-        return $result;
     }
     
 }

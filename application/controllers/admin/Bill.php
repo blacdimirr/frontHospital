@@ -24,7 +24,7 @@ class Bill extends Admin_Controller
         $this->yesno_condition    = $this->config->item('yesno_condition');
         $this->blood_group        = $this->config->item('bloodgroup');
         $this->notificationurl    = $this->config->item('notification_url');
-        $this->opd_prefix         = $this->customlib->getSessionPrefixByType('DAR-FO');
+        $this->opd_prefix         = $this->customlib->getSessionPrefixByType('opd_no');
         $this->appointment_status = $this->config->item('appointment_status');
         $this->load->model(array('charge_model', 'patient_model', 'appoint_priority_model', 'onlineappointment_model', 'transaction_model', 'conference_model', 'transaction_model', 'casereference_model'));
 
@@ -640,7 +640,7 @@ class Bill extends Admin_Controller
         if ($data['charge_details'][0]['opd_id'] != '') {
             $event_data = array(
                 'patient_id' => $patient['patient_id'],
-                'opd_id'     => $this->customlib->getSessionPrefixByType('DAR-FO') . $data['charge_details'][0]['opd_id'],
+                'opd_id'     => $this->customlib->getSessionPrefixByType('opd_no') . $data['charge_details'][0]['opd_id'],
                 'case_id'    => $case_id,
                 'net_amount' => $data['charge_details'][0]['apply_charge'],
                 'total'      => $data['charge_details'][0]['amount'],
@@ -768,8 +768,6 @@ class Bill extends Admin_Controller
     {
         $data['case_id']        = $case_id;
         $patient                = $this->patient_model->getDetailsByCaseId($case_id);
-        $visit_details                = $this->patient_model->getVisitsBycaseId($case_id);
-        $data['visit_details']         = $visit_details;
         $type                   = $this->input->post('module_type');
         $data['discharge_card'] = $this->patient_model->get_dischargeCard(array('case_reference_id' => $case_id));
         $data['opd_id']         = $patient['opdid'];
@@ -792,28 +790,15 @@ class Bill extends Admin_Controller
             $data['deathrecord'] = $deathrecord;
         }
         $data['death_status'] = $this->customlib->discharge_status();
-
-        // $data['custom_fields_value'] = display_custom_fields('ipd', $patient['ipdid']);
-        // $cutom_fields_data2             = get_custom_table_values($patient['ipdid'], 'ipd');
-        // $data['field_data']          = $cutom_fields_data2;
-
-        // $data['custom_fields_value_odp'] = display_custom_fields('odp', $id);
-        // $cutom_fields_data2_opd             = get_custom_table_values($id, 'odp');
-        // $data['field_data_odp']          = $cutom_fields_data2_opd;
-
-        // print_r($data['case_id']);
-        // die();
-        
-        $page                 = $this->load->view('admin/bill/_patient_egreso_epicrisis', $data, true);
-        // $page                 = $this->load->view('admin/bill/_patient_discharge', $data, true);
+        $page                 = $this->load->view('admin/bill/_patient_discharge', $data, true);
         echo json_encode(array('status' => 1, 'page' => $page));
     }
 
     public function add_discharge()
     {
         $this->form_validation->set_rules('discharge_date', $this->lang->line('discharge_date'), 'trim|required|xss_clean');
-        // $this->form_validation->set_rules('death_status', $this->lang->line('discharge_status'), 'trim|required|xss_clean');
-        // $this->form_validation->set_rules('document', $this->lang->line('document'), 'callback_handle_doc_upload[document]');
+        $this->form_validation->set_rules('death_status', $this->lang->line('discharge_status'), 'trim|required|xss_clean');
+        $this->form_validation->set_rules('document', $this->lang->line('document'), 'callback_handle_doc_upload[document]');
 
         if ($_POST['death_status'] == "1") {
             $this->form_validation->set_rules('death_date', $this->lang->line('death_date'), 'trim|required|xss_clean');
@@ -826,6 +811,7 @@ class Bill extends Admin_Controller
                         $custom_fields_name = $custom_fields_value['name'];
 
                         $this->form_validation->set_rules("custom_fields[death_report][" . $custom_fields_id . "]", $custom_fields_name, 'trim|required');
+
                     }
                 }
             }
@@ -834,16 +820,15 @@ class Bill extends Admin_Controller
             $this->form_validation->set_rules('referral_date', $this->lang->line('referral_date'), 'trim|required|xss_clean');
             $this->form_validation->set_rules('hospital_name', $this->lang->line('hospital_name'), 'trim|required|xss_clean');
         }
-
         if ($this->form_validation->run() == false) {
             $msg = array(
                 'discharge_date' => form_error('discharge_date'),
-                // 'death_status'   => form_error('death_status'),
-                // 'death_date'     => form_error('death_date'),
-                // 'referral_date'  => form_error('referral_date'),
-                // 'hospital_name'  => form_error('hospital_name'),
-                // 'guardian_name'  => form_error('guardian_name'),
-                // 'document'       => form_error('document'),
+                'death_status'   => form_error('death_status'),
+                'death_date'     => form_error('death_date'),
+                'referral_date'  => form_error('referral_date'),
+                'hospital_name'  => form_error('hospital_name'),
+                'guardian_name'  => form_error('guardian_name'),
+                'document'       => form_error('document'),
             );
 
             if (!empty($custom_fields)) {
@@ -851,8 +836,7 @@ class Bill extends Admin_Controller
                     if ($custom_fields_value['validation']) {
                         $custom_fields_id                                                     = $custom_fields_value['id'];
                         $custom_fields_name                                                   = $custom_fields_value['name'];
-                        $error_msg2["custom_fields[ipd][" . $custom_fields_id . "]"] = form_error("custom_fields[ipd][" . $custom_fields_id . "]");
-                        // $error_msg2["custom_fields[death_report][" . $custom_fields_id . "]"] = form_error("custom_fields[death_report][" . $custom_fields_id . "]");
+                        $error_msg2["custom_fields[death_report][" . $custom_fields_id . "]"] = form_error("custom_fields[death_report][" . $custom_fields_id . "]");
                     }
                 }
             }
@@ -893,15 +877,7 @@ class Bill extends Admin_Controller
                 'refer_to_hospital'   => $this->input->post('hospital_name'),
                 'reason_for_referral' => $this->input->post('reason_for_referral'),
                 'discharge_by'        => $this->customlib->getLoggedInUserID(),
-                'admitting_diagnosis'       => $this->input->post('admitting_diagnosis'),
-                'discharge_diagnosis'       => $this->input->post('discharge_diagnosis'),
-                'performed_procedures'      => $this->input->post('performed_procedures'),
-                'findings'                  => $this->input->post('findings'),
-                'treatment'                 => $this->input->post('treatment'),
-                'case_death'                => $this->input->post('case_death'),
-                'treatment_appointment'     => $this->input->post('treatment_appointment'),
-                'motivoAlta'     => $this->input->post('motivoAlta'),
-                'admitidoPor'     => $this->input->post('admitidoPor')
+
             );
 
             if ($opd_id != '') {
@@ -910,13 +886,10 @@ class Bill extends Admin_Controller
 
             if ($ipd_id != '') {
                 $data['ipd_details_id'] = $ipd_id;
+
             }
 
             $insert_id = $this->patient_model->add_discharge($data);
-            
-            // print_r($insert_id );
-            // die();
-
             if ($ipd_id != '') {
 
                 $bed_history_data['case_reference_id'] = $this->input->post('case_reference_id');
@@ -924,44 +897,6 @@ class Bill extends Admin_Controller
                 $bed_history_data['is_active']         = "no";
                 $this->bed_model->updateBedHistory($bed_history_data);
             }
-            /*
-            $msg = array(
-                'discharge_date' => form_error('discharge_date'),
-                'death_status'   => form_error('death_status'),
-                'death_date'     => form_error('death_date'),
-                'referral_date'  => form_error('referral_date'),
-                'hospital_name'  => form_error('hospital_name'),
-                'guardian_name'  => form_error('guardian_name'),
-                'document'       => form_error('document'),
-            );
-
-            if (!empty($error_msg2)) {
-                $error_msg = array_merge($msg, $error_msg2);
-            } else {
-                $error_msg = $msg;
-            }
-            $array = array('status' => 'fail', 'error' => $error_msg, 'message' => '');
-            */
-            $custom_field_post  = $this->input->post("custom_fields[ipd]");
-
-            // print_r($custom_field_post);
-            // die();
-
-            $custom_value_array = array();
-            if (!empty($custom_field_post)) {
-                foreach ($custom_field_post as $key => $value) {
-                    $check_field_type = $this->input->post("custom_fields[ipd][" . $key . "]");
-                    $field_value      = is_array($check_field_type) ? implode(",", $check_field_type) : $check_field_type;
-                    $array_custom     = array(
-                        'belong_table_id' => 0,
-                        'custom_field_id' => $key,
-                        'field_value'     => $field_value,
-                    );
-                    $custom_value_array[] = $array_custom;
-                }
-            }
-            // $this->customfield_model->insertRecord($custom_value_array, $ipd_id);
-
             if ($_POST['death_status'] == "1") {
                 $custom_field_post  = $this->input->post("custom_fields[death_report]");
                 $custom_value_array = array();
@@ -997,6 +932,7 @@ class Bill extends Admin_Controller
                     move_uploaded_file($_FILES["document"]["tmp_name"], "./uploads/death_image/" . $attachment);
                     $death_data['attachment']      = $attachment;
                     $death_data['attachment_name'] = $attachment_name;
+
                 }
 
                 $insert_id = $this->birthordeath_model->addDeathdata($death_data);
@@ -1035,32 +971,32 @@ class Bill extends Admin_Controller
             $balance_amount = amountFormat($total_amount - $paid_amount);
 
             if ($opd_id != '') {
-                // $event_data = array(
-                //     'patient_id'       => $this->input->post('patient_id'),
-                //     'opd_no'           => $this->customlib->getSessionPrefixByType('DAR-FO') . $opd_id,
-                //     'case_id'          => $this->input->post('case_reference_id'),
-                //     'discharge_date'   => $this->customlib->YYYYMMDDHisTodateFormat($discharge_date, $this->time_format),
-                //     'discharge_status' => $death_status,
-                // );
+                $event_data = array(
+                    'patient_id'       => $this->input->post('patient_id'),
+                    'opd_no'           => $this->customlib->getSessionPrefixByType('opd_no') . $opd_id,
+                    'case_id'          => $this->input->post('case_reference_id'),
+                    'discharge_date'   => $this->customlib->YYYYMMDDHisTodateFormat($discharge_date, $this->time_format),
+                    'discharge_status' => $death_status,
+                );
 
-                // $this->system_notification->send_system_notification('add_opd_discharge_patient', $event_data);
-                // $sender_details = array('patient_id' => $this->input->post('patient_id'), 'total_amount' => $total_amount, 'paid_amount' => $paid_amount, 'balance_amount' => $balance_amount, 'opd_no' => $opd_id);
+                $this->system_notification->send_system_notification('add_opd_discharge_patient', $event_data);
+                $sender_details = array('patient_id' => $this->input->post('patient_id'), 'total_amount' => $total_amount, 'paid_amount' => $paid_amount, 'balance_amount' => $balance_amount, 'opd_no' => $opd_id);
 
-                // $this->mailsmsconf->mailsms('opd_patient_discharged', $sender_details);
+                $this->mailsmsconf->mailsms('opd_patient_discharged', $sender_details);
             }
 
             if ($ipd_id != '') {
-                // $event_data = array(
-                //     'patient_id'       => $this->input->post('patient_id'),
-                //     'ipd_no'           => $this->customlib->getSessionPrefixByType('ipd_no') . $ipd_id,
-                //     'case_id'          => $this->input->post('case_reference_id'),
-                //     'discharge_date'   => $this->customlib->YYYYMMDDHisTodateFormat($discharge_date, $this->time_format),
-                //     'discharge_status' => $death_status,
-                // );
+                $event_data = array(
+                    'patient_id'       => $this->input->post('patient_id'),
+                    'ipd_no'           => $this->customlib->getSessionPrefixByType('ipd_no') . $ipd_id,
+                    'case_id'          => $this->input->post('case_reference_id'),
+                    'discharge_date'   => $this->customlib->YYYYMMDDHisTodateFormat($discharge_date, $this->time_format),
+                    'discharge_status' => $death_status,
+                );
 
-                // $this->system_notification->send_system_notification('add_ipd_discharge_patient', $event_data, $doctor_list);
-                // $sender_details = array('patient_id' => $this->input->post('patient_id'), 'total_amount' => $total_amount, 'paid_amount' => $paid_amount, 'balance_amount' => $balance_amount); 
-                //  $this->mailsmsconf->mailsms('ipd_patient_discharged', $sender_details);
+                $this->system_notification->send_system_notification('add_ipd_discharge_patient', $event_data, $doctor_list);
+                $sender_details = array('patient_id' => $this->input->post('patient_id'), 'total_amount' => $total_amount, 'paid_amount' => $paid_amount, 'balance_amount' => $balance_amount); 
+                 $this->mailsmsconf->mailsms('ipd_patient_discharged', $sender_details);
             }
 
         }
@@ -1083,15 +1019,6 @@ class Bill extends Admin_Controller
         $data['patient_id']     = $patient['patient_id'];
         $data['guardian_name']  = $patient['guardian_name'];
         $download               = "";
-
-        $data['custom_fields_value'] = display_custom_fields('ipd', $id);
-        $cutom_fields_data2             = get_custom_table_values($id, 'ipd');
-        $data['field_data']          = $cutom_fields_data2;
-
-        $data['custom_fields_value_odp'] = display_custom_fields('odp', $id);
-        $cutom_fields_data2_opd             = get_custom_table_values($id, 'odp');
-        $data['field_data_odp']          = $cutom_fields_data2_opd;
-
         if (!empty($data['discharge_card']) && $data['discharge_card']['discharge_status'] == '1') {
             $death_record = $this->birthordeath_model->getDeDetailsbycaseId($case_id);
             $id           = $death_record['id'];
@@ -1111,23 +1038,9 @@ class Bill extends Admin_Controller
         }
 
         $action = '<a href="javascript:void(0);" class=" print_dischargecard" data-toggle="tooltip" title="" data-module_type="' . $type . '" data-case_id="' . $case_id . '" data-recordId="' . $id . '" data-original-title=""><i class="fa fa-print"></i> </a>' . $download;
-
-        // custom_fields_value
-
-        $result_custom         = $this->patient_model->getcustomField($patient['ipdid']);
-        $result_custom_details         = $this->patient_model->getIpdDetails($patient['ipdid']);
-        $data["result_custom"] = $result_custom;
-        $data["result_custom_details"] = $result_custom_details;
-
-        // print_r($result_custom_details);
-        // die();
-        
-        // $page   = $this->load->view('admin/bill/_printDischargeCard', $data, true);
-        $page   = $this->load->view('admin/bill/_print_egreso', $data, true);
+        $page   = $this->load->view('admin/bill/_printDischargeCard', $data, true);
         echo json_encode(array('status' => 1, 'page' => $page, 'action' => $action));
     }
-
-    
 
     public function printBillReport()
     {
@@ -1241,7 +1154,7 @@ class Bill extends Admin_Controller
                     $event_data = array(
                         'revert_date'     => $this->customlib->YYYYMMDDHisTodateFormat($revert_date, $this->customlib->getHospitalTimeFormat()),
                         'patient_id'       => $patientid,
-                        'opd_no'           => $this->customlib->getSessionPrefixByType('DAR-FO') . $data['discharge_card']['opd_details_id'],
+                        'opd_no'           => $this->customlib->getSessionPrefixByType('opd_no') . $data['discharge_card']['opd_details_id'],
                         'discharge_status' => $death_status,
                         'discharge_date'   => $this->customlib->YYYYMMDDHisTodateFormat($data['discharge_card']['discharge_date'], $this->customlib->getHospitalTimeFormat()),
                         'case_id'          => $case_id,
@@ -2354,7 +2267,7 @@ class Bill extends Admin_Controller
                 }
             }
 
-            $this->opd_prefix = $this->customlib->getSessionPrefixByType('DAR-FO');
+            $this->opd_prefix = $this->customlib->getSessionPrefixByType('opd_no');
             $transaction_data = array(
 
                 'case_reference_id' => 0,
@@ -2448,7 +2361,7 @@ class Bill extends Admin_Controller
                     'zoom_api_secret' => "",
                 );
 
-                $title = 'Online consult for ' . $this->customlib->getSessionPrefixByType('DAR-FO') . $opdn_id . " Checkup ID " . $visit_details_id['visitid'];
+                $title = 'Online consult for ' . $this->customlib->getSessionPrefixByType('opd_no') . $opdn_id . " Checkup ID " . $visit_details_id['visitid'];
                 $this->load->library('zoom_api', $params);
                 $insert_array = array(
                     'staff_id'         => $doctor_id,
@@ -2601,7 +2514,7 @@ class Bill extends Admin_Controller
 
                 $action = "<div class=''>";
                 if ($this->rbac->hasPrivilege('opd_print_bill', 'can_view')) {
-                    // $action .= "<a href='javascript:void(0)' data-loading-text='<i class=\"fa fa-circle-o-notch fa-spin\"></i>' data-opd-id=" . $opd_id . " data-record-id=" . $visit_details_id . " class='btn btn-default btn-xs print_visit_bill'  data-toggle='tooltip' title='" . $this->lang->line('print_bill') . "'><i class='fa fa-file'></i></a>";
+                    $action .= "<a href='javascript:void(0)' data-loading-text='<i class=\"fa fa-circle-o-notch fa-spin\"></i>' data-opd-id=" . $opd_id . " data-record-id=" . $visit_details_id . " class='btn btn-default btn-xs print_visit_bill'  data-toggle='tooltip' title='" . $this->lang->line('print_bill') . "'><i class='fa fa-file'></i></a>";
                 }
 
                 $action .= "<a href='javascript:void(0)' data-loading-text='" . $this->lang->line('please_wait') . "' data-opd-id=" . $opd_id . " data-record-id=" . $visit_details_id . " class='btn btn-default btn-xs get_opd_detail'  data-toggle='tooltip' title='" . $this->lang->line('show') . "'><i class='fa fa-reorder'></i></a>";
@@ -3223,7 +3136,7 @@ class Bill extends Admin_Controller
                 }
             }
 
-            $sender_details = array('patient_id' => $patient_id, 'opd_no' => $this->customlib->getSessionPrefixByType('DAR-FO') . $opd_id, 'contact_no' => $this->input->post('contact'), 'email' => $this->input->post('email'));
+            $sender_details = array('patient_id' => $patient_id, 'opd_no' => $this->customlib->getSessionPrefixByType('opd_no') . $opd_id, 'contact_no' => $this->input->post('contact'), 'email' => $this->input->post('email'));
 
             $array = array('status' => 'success', 'error' => '', 'message' => $this->lang->line('success_message'));
         }

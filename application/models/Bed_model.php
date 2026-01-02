@@ -61,31 +61,18 @@ class Bed_model extends MY_Model
     public function bed_list($id = null)
     {
         $data = array();
-        // $this->db->select('bed.*, bed_type.name as bed_type_name,floor.name as floor_name,bed_group.name as bedgroup,bed_group.id as bedgroupid,patients.id as pid,patients.is_active as patient_status,patients.id as patient_unique_id,patients.patient_name,patients.gender,patients.guardian_name,patients.mobileno,
-        
-        //  ipd_details.date,
-        //  ipd_details.id as ipd_details_id,
-        //  ipd_details.bed, 
-        //  ipd_details.discharged as ipd_discharged, 
-        //  referencia_cama_chequeo.case_reference_id,
-         
-        //  staff.name as staff,staff.surname')->from('bed');
-        // $this->db->join('bed_type', 'bed.bed_type_id = bed_type.id', 'left');
-        // $this->db->join('bed_group', 'bed.bed_group_id = bed_group.id', 'left');
-        // $this->db->join('floor', 'floor.id = bed_group.floor', 'left');
-        // $this->db->join('ipd_details', 'bed.id = ipd_details.bed', 'left');
-        // $this->db->join('staff', 'staff.id = ipd_details.cons_doctor', 'left');
-        // $this->db->join('patients', 'patients.id = ipd_details.patient_id', 'left');
-        // $this->db->join('referencia_cama_chequeo', '(bed.id = referencia_cama_chequeo.bed_id AND referencia_cama_chequeo.patient_id = patients.id)', 'left');
-        // $this->db->order_by('bed.id', 'asc');
-
-       $this->db->select('*')->from('bed_list');
-       $this->db->order_by('id', 'asc');
-        
+        $this->db->select('bed.*, bed_type.name as bed_type_name,floor.name as floor_name, bed_group.name as bedgroup,bed_group.id as bedgroupid,patients.id as pid,patients.is_active as patient_status,patients.id as patient_unique_id,patients.patient_name,patients.gender,patients.guardian_name,patients.mobileno,ipd_details.date,ipd_details.id as ipd_details_id,ipd_details.bed, ipd_details.discharged as ipd_discharged, staff.name as staff,staff.surname')->from('bed');
+        $this->db->join('bed_type', 'bed.bed_type_id = bed_type.id', 'left');
+        $this->db->join('bed_group', 'bed.bed_group_id = bed_group.id', 'left');
+        $this->db->join('floor', 'floor.id = bed_group.floor', 'left');
+        $this->db->join('ipd_details', 'bed.id = ipd_details.bed', 'left');
+        $this->db->join('staff', 'staff.id = ipd_details.cons_doctor', 'left');
+        $this->db->join('patients', 'patients.id = ipd_details.patient_id', 'left');
+        $this->db->order_by('bed.id', 'asc');
         if ($id) {
-            $this->db->where('id', $id);
+            $this->db->where('bed.id', $id);
         } else {
-            $this->db->order_by('id', 'desc');
+            $this->db->order_by('bed.id', 'desc');
         }
         $query = $this->db->get();
         if ($id != null) {
@@ -95,21 +82,10 @@ class Bed_model extends MY_Model
         }
 
         if (!empty($result)) {
-            foreach ($result as $key => $value) {               
-                if ($value["pid"]) {                    
-                    //  if (!is_null($value["case_reference_id"]) ){
-                    //         $val        = $value['bed'];
-                    //         $data[$val] = $value;
-                    //         $data[] = $value;
-                    //         print_r($value["case_reference_id"]);
-                    //         die();
-                    //     }
-                    //  $val        = $value['bed'];
-                    // $data[$val] = $value;
-                    if ( ($value['patient_status'] == 'yes') && ($value['ipd_discharged'] == 'no' || !is_null($value["case_reference_id"]))) {
+            foreach ($result as $key => $value) {
+                if ($value["pid"]) {
+                    if (($value['patient_status'] == 'yes') && ($value['ipd_discharged'] == 'no')) {
                         $data[] = $value;
-                        // print_r($value);
-                        // die();
                     } elseif (($value['is_active'] == 'yes')) {
                         $val        = $value['bed'];
                         $data[$val] = $value;
@@ -119,9 +95,6 @@ class Bed_model extends MY_Model
                 }
             }
         }
-
-        // print_r($data );
-        // die();
 
         return $data;
     }
@@ -314,7 +287,7 @@ class Bed_model extends MY_Model
 
     public function getBedHistory($case_reference_id)
     {
-        $result = $this->db->select("bed_group.name as bed_group,bed.name as bed,patient_bed_history.from_date,patient_bed_history.to_date, patient_bed_history.is_active,bed.id as bed_id")
+        $result = $this->db->select("bed_group.name as bed_group,bed.name as bed,patient_bed_history.from_date,patient_bed_history.to_date, patient_bed_history.is_active")
             ->join("bed_group", "bed_group.id=patient_bed_history.bed_group_id", "left")
             ->join("bed", "bed.id=patient_bed_history.bed_id", "left")
             ->where("case_reference_id", $case_reference_id)
@@ -327,13 +300,5 @@ class Bed_model extends MY_Model
     {
         $this->db->update("patient_bed_history", array("is_active" => "no"), array("case_reference_id" => $case_reference_id));
     }
-
-    // public function getBedHistory($case_reference_id)
-    // {
-    //     $query  = $this->db->select('*')->where("case_reference_id", $case_reference_id)->get("patient_bed_history");
-    //     $result = $query->row_array();
-
-    //     // $this->db->select("patient_bed_history", array("is_active" => "no"), array("case_reference_id" => $case_reference_id));
-    // }
 
 }

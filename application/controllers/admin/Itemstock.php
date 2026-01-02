@@ -61,10 +61,6 @@ class Itemstock extends Admin_Controller
         $data['itemsupplier'] = $itemsupplier;
         $itemstore            = $this->itemstore_model->get();
         $data['itemstore']    = $itemstore;
-
-        $expense_result      = $this->expense_model->get();
-        $data['expenselist'] = $expense_result;
-
         $this->load->view('layout/header', $data);
         $this->load->view('admin/itemstock/itemList', $data);
         $this->load->view('layout/footer', $data);
@@ -91,9 +87,6 @@ class Itemstock extends Admin_Controller
 
                 if ($value->attachment) {
                     $action .= "<a href=" . base_url() . 'admin/itemstock/download/' . $value->attachment . " onclick='' class='btn btn-default btn-xs'  data-toggle='tooltip' title='" . $this->lang->line('download') . "'><i class='fa fa-download'></i></a>";
-                }
-                if ($value->documents_other) {
-                    $action .= "<a href=" . base_url() . 'admin/itemstock/download/' . $value->documents_other . " onclick='' class='btn btn-default btn-xs'  data-toggle='tooltip' title='" . $this->lang->line('evidence') . "'><i class='fa fa-download'></i></a>";
                 }
 
                 if ($this->rbac->hasPrivilege('item_stock', 'can_edit')) {
@@ -134,7 +127,6 @@ class Itemstock extends Admin_Controller
         $this->form_validation->set_rules('item_category_id', $this->lang->line('item_category'), 'trim|required|xss_clean');
         $this->form_validation->set_rules('supplier_id', $this->lang->line('supplier'), 'trim|required|xss_clean');
         $this->form_validation->set_rules('item_photo', $this->lang->line('item_photo'), 'callback_handle_upload');
-        $this->form_validation->set_rules('expense_id', $this->lang->line('expenses'), 'trim|required|xss_clean');
 
         if ($this->form_validation->run() == false) {
             $msg = array(
@@ -144,7 +136,6 @@ class Itemstock extends Admin_Controller
                 'item_photo'     => form_error('item_photo'),
                 'purchase_price' => form_error('purchase_price'),
                 'supplier_id'    => form_error('supplier_id'),
-                'expense_id'     => form_error('expense_id'),
             );
 
             $array = array('status' => 'fail', 'error' => $msg, 'message' => '');
@@ -160,8 +151,6 @@ class Itemstock extends Admin_Controller
                 'quantity'       => $this->input->post('symbol') . $this->input->post('quantity'),
                 'date'           => $date,
                 'description'    => $this->input->post('description'),
-                'expense_id'       => $this->input->post('expense_id'),
-                // 'documents_other'       => $this->input->post('documents_other')
             );
 
             $insert_id = $this->itemstock_model->add($data);
@@ -170,13 +159,6 @@ class Itemstock extends Admin_Controller
                 $img_name = $insert_id . '.' . $fileInfo['extension'];
                 move_uploaded_file($_FILES["item_photo"]["tmp_name"], "./uploads/inventory_items/" . $img_name);
                 $data_img = array('id' => $insert_id, 'attachment' => 'uploads/inventory_items/' . $img_name);
-                $this->itemstock_model->add($data_img);
-            }
-            if (isset($_FILES["documents_other"]) && !empty($_FILES['documents_other']['name'])) {
-                $fileInfo = pathinfo($_FILES["documents_other"]["name"]);
-                $img_name = $insert_id . '-other.' . $fileInfo['extension'];
-                move_uploaded_file($_FILES["documents_other"]["tmp_name"], "./uploads/inventory_items/" . $img_name);
-                $data_img = array('id' => $insert_id, 'documents_other' => 'uploads/inventory_items/' . $img_name);
                 $this->itemstock_model->add($data_img);
             }
 
@@ -194,8 +176,6 @@ class Itemstock extends Admin_Controller
         $this->form_validation->set_rules('supplier_id', $this->lang->line('supplier'), 'trim|required|xss_clean');
         $this->form_validation->set_rules('purchase_price', $this->lang->line('purchase_price'), 'trim|required|xss_clean');
         $this->form_validation->set_rules('item_photo', $this->lang->line('item_photo'), 'callback_handle_upload');
-        $this->form_validation->set_rules('expense_id', $this->lang->line('expenses'), 'trim|required|xss_clean');
-
         if ($this->form_validation->run() == false) {
             $msg = array(
                 'e1'             => form_error('item_id'),
@@ -204,7 +184,6 @@ class Itemstock extends Admin_Controller
                 'purchase_price' => form_error('purchase_price'),
                 'item_photo'     => form_error('item_photo'),
                 'supplier_id'    => form_error('supplier_id'),
-                'expense_id'     => form_error('expense_id'),
             );
 
             $array = array('status' => 'fail', 'error' => $msg, 'message' => '');
@@ -222,8 +201,6 @@ class Itemstock extends Admin_Controller
                 'purchase_price' => $this->input->post('purchase_price'),
                 'date'           => $this->customlib->dateFormatToYYYYMMDD($date),
                 'description'    => $this->input->post('description'),
-                'expense_id'       => $this->input->post('expense_id'),
-                // 'documents_other'       => $this->input->post('documents_other')
             );
 
             $insert_id = $this->itemstock_model->add($data);
@@ -232,13 +209,6 @@ class Itemstock extends Admin_Controller
                 $img_name = $updateid . '.' . $fileInfo['extension'];
                 move_uploaded_file($_FILES["item_photo"]["tmp_name"], "./uploads/inventory_items/" . $img_name);
                 $data_img = array('id' => $updateid, 'attachment' => 'uploads/inventory_items/' . $img_name);
-                $this->itemstock_model->add($data_img);
-            }
-            if (isset($_FILES["documents_other"]) && !empty($_FILES['documents_other']['name'])) {
-                $fileInfo = pathinfo($_FILES["documents_other"]["name"]);
-                $img_name = $updateid . '.' . $fileInfo['extension'];
-                move_uploaded_file($_FILES["documents_other"]["tmp_name"], "./uploads/inventory_items/" . $img_name);
-                $data_img = array('id' => $updateid, 'documents_other' => 'uploads/inventory_items/' . $img_name);
                 $this->itemstock_model->add($data_img);
             }
 
@@ -328,14 +298,6 @@ class Itemstock extends Admin_Controller
         $itemstore            = $this->itemstore_model->get();
         $data['itemstore']    = $itemstore;
         $item["date"]         = $this->customlib->YYYYMMDDTodateFormat($item['date']);
-
-
-
-        // print_r(json_encode($item));
-        // die();
-        $expense_result      = $this->expense_model->get();
-        $data['expenselist'] = $expense_result;
-
         echo json_encode($item);
     }
 

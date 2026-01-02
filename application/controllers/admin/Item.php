@@ -14,9 +14,6 @@ class Item extends Admin_Controller
         $this->load->library('datatables');
         $this->config->load("payroll");
         $this->search_type = $this->config->item('search_type');
-
-        require_once 'application\libraries\api\inventario_external.php';
-        require_once 'application\libraries\icd-api\classes\response.class.php';
     }
 
     public function index()
@@ -29,34 +26,9 @@ class Item extends Admin_Controller
         $data['itemlist']    = $item_result;
         $itemcategory        = $this->itemcategory_model->get();
         $data['itemcatlist'] = $itemcategory;
-
-        $inventario_productos = $this->getProductos();
-        
-        $responses = json_decode($inventario_productos,true);
-
-        $productos = $responses['data']['data'];
-
-        $data['inventario_productos'] = $productos;
-
-        // print_r($productos);
-        // die();
-
         $this->load->view('layout/header', $data);
         $this->load->view('admin/item/itemList', $data);
         $this->load->view('layout/footer', $data);
-    }
-
-    public function getProductos(){
-
-        $response = new Response();
-
-        $url = 'https://account.ardan.com.do/api/products';
-
-        $inventario_api_client = new INVENTARIO_API_Client($url);
-        $response->set(1, $inventario_api_client->get());
-
-        return $response->encode();
-
     }
 
     public function getitemdatatable()
@@ -91,8 +63,7 @@ class Item extends Admin_Controller
                 $row[]     = $link . $value->name . '</a>' . $div . $text . "</div>" . $action;
                 $row[]     = $value->item_category;
                 $row[]     = $value->unit;
-                $row[]     = $value->quantity;
-                // $row[]     = $value->added_stock - $value->issued;
+                $row[]     = $value->added_stock - $value->issued;
                 $row[]     = $value->description;
                 $row[]     = "";
                 $dt_data[] = $row;
@@ -111,8 +82,7 @@ class Item extends Admin_Controller
     {
         $dt_response = $this->itemstock_model->getAllitemreportRecord();
         $dt_response = json_decode($dt_response);
-        $dt_data     = array(); 
-
+        $dt_data     = array();
         if (!empty($dt_response->data)) {
             foreach ($dt_response->data as $key => $value) {
 
@@ -121,8 +91,7 @@ class Item extends Admin_Controller
                 $row[] = $value->name;
                 $row[] = $value->item_category;
                 $row[] = $value->item_supplier;
-                $row[] = $value->quantity_item;
-                // $row[] = $value->item_store;
+                $row[] = $value->item_store;
                 $row[] = $value->available_stock;
                 $row[] = $value->total_issued;
                 $row[] = ($value->available_stock - $value->total_issued);
@@ -141,54 +110,33 @@ class Item extends Admin_Controller
 
     public function add()
     {
-        $this->form_validation->set_rules('item_id', $this->lang->line('item'), 'trim|required|xss_clean');
-        // $this->form_validation->set_rules('name', $this->lang->line('item'), 'trim|required|xss_clean');
-        // $this->form_validation->set_rules('unit', $this->lang->line('unit'), 'trim|required|xss_clean');
-        // $this->form_validation->set_rules(
-        //     'item_category_id', $this->lang->line('item_category'), array(
-        //         'required',
-        //         array('check_exists', array($this->item_model, 'valid_check_exists')),
-        //     )
-        // );
-        // $this->form_validation->set_rules(
-        //     'name', $this->lang->line('item'), array(
-        //         'required',
-        //         array('check_exists', array($this->item_model, 'valid_check_exists')),
-        //     )
-        // );
-
-        $item = $this->input->post('item_id');
-
-        $item = json_decode($item);
-
-       
+        $this->form_validation->set_rules('name', $this->lang->line('item'), 'trim|required|xss_clean');
+        $this->form_validation->set_rules('unit', $this->lang->line('unit'), 'trim|required|xss_clean');
+        $this->form_validation->set_rules(
+            'item_category_id', $this->lang->line('item_category'), array(
+                'required',
+                array('check_exists', array($this->item_model, 'valid_check_exists')),
+            )
+        );
 
         if ($this->form_validation->run() == false) {
             $msg = array(
-                // 'name'             => form_error('name'),
-                // 'unit'             => form_error('unit'),
-                // 'item_category_id' => form_error('item_category_id'),
-                'item' => form_error('item_id'),
+                'name'             => form_error('name'),
+                'unit'             => form_error('unit'),
+                'item_category_id' => form_error('item_category_id'),
             );
 
             $array = array('status' => 'fail', 'error' => $msg);
-        } else {         
+        } else {
 
             $data = array(
-                // 'item_category_id' => $this->input->post('item_category_id'),
-                // 'name'             => $this->input->post('name'),
-                // 'unit'             => $this->input->post('unit'),
-                'item_id_text'             => $this->input->post('item_id'),
-                'item_category_id' => $item->category_id,
-                'unit'             => $item->unit->name,
-                'quantity'         => $item->quantity,
-                'item_id'          => $item->id,
-                'name'             => $this->input->post('name_select'),
+                'item_category_id' => $this->input->post('item_category_id'),
+                'name'             => $this->input->post('name'),
+                'unit'             => $this->input->post('unit'),
                 'description'      => $this->input->post('description'),
             );
 
             $insert_id = $this->item_model->add($data);
-
             $array     = array('status' => 'success', 'error' => '', 'message' => $this->lang->line('new_item_successfully_inserted'));
         }
         echo json_encode($array);
@@ -217,8 +165,7 @@ class Item extends Admin_Controller
     {
         $item_id   = $this->input->get('item_id');
         $data      = $this->item_model->getItemAvailable($item_id);
-        // $available = ($data['added_stock'] - $data['issued']);
-        $available = ($data['quantity']);
+        $available = ($data['added_stock'] - $data['issued']);
         echo json_encode(array('available' => $available));
     }
 
@@ -263,10 +210,6 @@ class Item extends Admin_Controller
             'name'             => $item['name'],
             'unit'             => $item['unit'],
             'description'      => $item['description'],
-            'quantity'      => $item['quantity'],
-            'item_id'      => $item['item_id'],
-            'description'      => $item['description'],
-            'item_id_text'      => $item['item_id_text'],
         );
 
         echo json_encode($data);

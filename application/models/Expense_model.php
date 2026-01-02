@@ -39,7 +39,7 @@ class Expense_model extends MY_Model
 
     public function get($id = null)
     {
-        $this->db->select('expenses.id,expenses.date,expenses.name,expenses.invoice_no,expenses.amount,expenses.documents,expenses.note,expense_head.exp_category,expenses.exp_head_id,expenses.documents_other,expenses.income_id')->from('expenses');
+        $this->db->select('expenses.id,expenses.date,expenses.name,expenses.invoice_no,expenses.amount,expenses.documents,expenses.note,expense_head.exp_category,expenses.exp_head_id')->from('expenses');
         $this->db->join('expense_head', 'expenses.exp_head_id = expense_head.id');
         if ($id != null) {
             $this->db->where('expenses.id', $id);
@@ -319,7 +319,7 @@ class Expense_model extends MY_Model
         $custom_field_column = (empty($custom_field_column_array))? "": ",".implode(',', $custom_field_column_array);
 
         $this->datatables
-            ->select('expenses.id,expenses.date,expenses.name,expenses.invoice_no,expenses.amount,expenses.documents,expenses.documents_other,expenses.note,expense_head.exp_category,expenses.exp_head_id,expenses.income_id' . $field_variable)           
+            ->select('expenses.id,expenses.date,expenses.name,expenses.invoice_no,expenses.amount,expenses.documents,expenses.note,expense_head.exp_category,expenses.exp_head_id' . $field_variable)           
             ->searchable('expenses.name,expenses.invoice_no,expenses.date,expenses.note,expense_head.exp_category,expenses.amount'.$custom_field_column)
             ->orderable('expenses.name,expenses.invoice_no,expenses.date,expenses.note,expense_head.exp_category,expenses.amount'.$custom_field_column)
             ->join('expense_head', 'expenses.exp_head_id = expense_head.id')

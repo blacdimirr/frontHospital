@@ -186,26 +186,6 @@
                                     <span class="text-danger"><?php echo form_error('item_photo'); ?></span>
                                 </div>
                             </div>
-                            <!-- gastos -->
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <label for="exampleInputEmail1"><?php echo $this->lang->line('expenses'); ?> <small class="req"> *</small></label>
-                                    <select autofocus="" id="expense_id" name="expense_id" class="form-control" >
-                                        <option value=""><?php echo $this->lang->line('select'); ?></option>
-                                        <?php foreach ($expenselist as $expense) { ?>
-                                        <option value="<?php echo $expense['id'] ?>">
-                                            <?php echo $expense['invoice_no'].' - '.$expense['name'] ?>
-                                        </option>
-                                        <?php $count++; } ?>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <label for="exampleInputEmail1"><?php echo $this->lang->line('evidence'); ?></label>
-                                    <input id="documents_other" name="documents_other" placeholder="" type="file" class="filestyle form-control" value="<?php echo set_value('documents_other'); ?>" />
-                                </div>
-                            </div>
                         </div>
                     </div><!--./modal-->
                 </div>
@@ -341,27 +321,6 @@
                                 <label for="exampleInputEmail1"><?php echo $this->lang->line('attach_document') ; ?></label>
                                 <input id="edititem_photo" name="item_photo" placeholder="" type="file" class="filestyle form-control" data-height="40"  value="<?php echo set_value('item_photo'); ?>" />
                                 <span class="text-danger"><?php echo form_error('item_photo'); ?></span>
-                            </div>
-                        </div>
-                        <!-- Gastos -->
-                        <div class="col-sm-6" >
-                            <div class="form-group">
-                                <?php // print_r($expense_id); die(); ?>
-                                <label for="exampleInputEmail1"><?php echo $this->lang->line('expenses'); ?> <small class="req"> *</small></label>
-                                <select autofocus="" id="expense_id_edit" name="expense_id" class="form-control" >
-                                    <option value=""><?php echo $this->lang->line('select'); ?></option>
-                                    <?php foreach ($expenselist as $expense) { ?>
-                                    <option  class="<?php  echo $expense['id'] ?>" value="<?php echo $expense['id'] ?>"<?php
-                                        ?>><?php echo $expense['invoice_no'].' - '.$expense['name'] ?>                                            
-                                    </option>
-                                    <?php $count++; } ?>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label for="exampleInputEmail1"><?php echo $this->lang->line('evidence'); ?></label>
-                                <input id="documents_other" name="documents_other" placeholder="" type="file" class="filestyle form-control" value="<?php echo set_value('documents_other'); ?>" />
                             </div>
                         </div>
                     </div>
@@ -563,7 +522,6 @@
                 $("#epurchase_price").val(res.purchase_price);
                 $("#editdescription").text(res.description);
                 $("#itemstockid").val(res.id);
-                $("#expense_id_edit").val(res.expense_id).change();
                 populateItem(res.item_id, res.item_category_id, 'edititem_id');
 
                 $('#editmyModal').modal('show');

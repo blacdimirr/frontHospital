@@ -9,17 +9,12 @@
                         <legend class="text-center floorwardbg"><h4><?php echo $bedgroup["name"] ?></h4></legend>
                         <div class="row"> 
                             <?php foreach ($bedlist as $key => $beds) {
-                                // print_r($beds['gender']);
-                                // die();
                             if ($beds["bedgroupid"] == $bedgroup["id"]) {
                             if ($beds["is_active"] == 'no' && $beds["pid"]) {
                                 $name = $beds["patient_name"];
-                                $url = '';
-                                if (isset($beds["case_reference_id"])) { $url = "admin/patient/profile/" . $beds["pid"]; }
-                                else { $url = "admin/patient/ipdprofile/" . $beds["ipd_details_id"]; }
                             ?>
                             <div class="col-md-1 col-xs-6 col-lg-1 col-sm-4">
-                                <a data-toggle="popover" class="beddetail_popover" href="<?php echo base_url() . $url; ?>">
+                                <a data-toggle="popover" class="beddetail_popover" href="<?php echo base_url() . "admin/patient/ipdprofile/" . $beds["ipd_details_id"] ?>">
                                     <div class="relative">
                                         <div class="<?php if ($beds["is_active"] == "yes") {
                                                 echo "bedgreen";
@@ -32,24 +27,7 @@
                                         </div>
                                     </div>
                                     <div class="bed_detail_popover" style="display: none">
-                                        <?php 
-                                        echo 
-                                        // $this->lang->line('patient_id') . " : " . $beds["patient_unique_id"] . "<br/>" . 
-                                        // $this->lang->line('phone') . " : " . $beds["mobileno"] . "<br/>" . $this->lang->line('gender') . " : " . $beds["gender"] . "<br/>" . 
-                                        '<b>'.$this->lang->line('bed_no') . "</b> : " . $beds["name"] . "<br/>" . 
-                                        '<b>'.$this->lang->line('admission_date') . "</b> : " . date($this->customlib->getHospitalDateFormat(true, true), strtotime($beds['date'])) . "<br/>" . 
-                                        '<b>'.$this->lang->line('patient_name') . "</b> : " . $beds["patient_name"] . "<br/>" . 
-                                        '<b>'.$this->lang->line('consultant') . "</b> : " . $beds["staff"] . " " . $beds["surname"] . "<br/> <br/>" . 
-                                        
-                                        '<b>'.$this->lang->line('guardian_name') . "</b> : " . $beds["guardian_name"] . "<br/>" . 
-                                        '<b>'.$this->lang->line('gender') . "</b> : " . $beds["gender"] . "<br/>" . 
-                                        '<b>'.$this->lang->line('edad') . "</b> : " . $beds['age'].' años ' .$beds['month'].' Meses con '.$beds['day']. "<br/>" . 
-                                        '<b>'.$this->lang->line('consultant') . "</b> : " . $beds["staff"] . " " . $beds["surname"]; 
-                                        
-
-                                        
-                                        ?>
-
+                                        <?php echo $this->lang->line('bed_no') . " : " . $beds["name"] . "<br/>" . $this->lang->line('patient_id') . " : " . $beds["patient_unique_id"] . "<br/>" . $this->lang->line('admission_date') . " : " . date($this->customlib->getHospitalDateFormat(true, true), strtotime($beds['date'])) . "<br/>" . $this->lang->line('phone') . " : " . $beds["mobileno"] . "<br/>" . $this->lang->line('gender') . " : " . $beds["gender"] . "<br/>" . $this->lang->line('guardian_name') . " : " . $beds["guardian_name"] . "<br/>" . $this->lang->line('consultant') . " : " . $beds["staff"] . " " . $beds["surname"]; ?>
                                     </div>
                                 </a>
                             </div><!--./col-md-2-->

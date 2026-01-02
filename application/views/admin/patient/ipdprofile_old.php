@@ -3727,13 +3727,13 @@ $categorylist = $this->operationtheatre_model->category_list();
                                                 <div class="col-sm-2 col-xs-4">
                                                     <div class="form-group">
                                                         <label for="pwd"><?php echo $this->lang->line('height'); ?></label> 
-                                                        <input name="height" id="evheight" type="number" min="1" class="form-control" />
+                                                        <input name="height" id="evheight" type="text" class="form-control" />
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-2 col-xs-4">
                                                     <div class="form-group">
                                                         <label for="pwd"><?php echo $this->lang->line('weight'); ?></label> 
-                                                        <input name="weight" id="evweight"  type="number" min="1"  class="form-control" />
+                                                        <input name="weight" id="evweight" type="text" class="form-control" />
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-2 col-xs-4">
@@ -6624,23 +6624,6 @@ function delete_prescription(prescription_id) {
                 "image": false,
             }
         });
-    });
-
-    function calcularASC() {
-        let height = parseFloat($('input[name="height"]').val());
-        let weight = parseFloat($('input[name="weight"]').val());
-
-        if (!isNaN(height) && !isNaN(weight)) {
-            let resultado = (weight * height) / 3600;
-            resultado = resultado.toFixed(3);
-            $('#_asc').val(resultado);
-        } else {
-            $('#_asc').val('');
-        }
-    }
-
-    $(document).on('input', 'input[name="height"], input[name="weight"]', function() {
-        calcularASC();
     });
 </script>
 

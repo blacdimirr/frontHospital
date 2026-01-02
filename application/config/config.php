@@ -24,8 +24,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
   | a PHP script and you can easily do that on your own.
   |
  */
-//$config['base_url'] = 'http://localhost/hospital-prod/backup/';
-$config['base_url'] = 'http:localhost:8084/';
+$config['base_url'] = 'http://localhost:8084/frontHospital/';
 
 
 /*
@@ -514,6 +513,6 @@ $config['rewrite_short_tags'] = FALSE;
   | Array:		array('10.0.1.200', '192.168.5.0/24')
  */
 $config['routine_session'] = 16;
-$config['routine_update'] = 1765166400;
+$config['routine_update'] = 1767326400;
 $config['proxy_ips'] = '';
 $config['installed'] = true;

@@ -37,40 +37,9 @@ class Expense extends Admin_Controller
         $data['fields']      = $this->customfield_model->get_custom_fields('expenses', 1);
         $expnseHead          = $this->expensehead_model->get();
         $data['expheadlist'] = $expnseHead;
-
-        // $data['amount_income'] = $this->getTotal()[0]['total_amount'];
-        if (!empty($this->getTotal()) ) {
-            $data['amount_income'] = $this->getTotal()[0]['total_amount'];
-        } else {
-            $data['amount_income'] = 0;
-        }
-
         $this->load->view('layout/header', $data);
         $this->load->view('admin/expense/expenseList', $data);
         $this->load->view('layout/footer', $data);
-    }
-
-    public function getTotal(){
-        $i               = 1;
-        $custom_fields   = $this->customfield_model->get_custom_fields('income',1,'','');
-        $field_var_array = array();
-        if (!empty($custom_fields)) {
-            foreach ($custom_fields as $custom_fields_key => $custom_fields_value) {
-                $tb_counter = "table_custom_" . $i;
-                array_push($field_var_array, 'table_custom_' . $i . '.field_value as ' . $custom_fields_value->name);
-                $this->db->join('custom_field_values as ' . $tb_counter, 'income.id = ' . $tb_counter . '.belong_table_id AND ' . $tb_counter . '.custom_field_id = ' . $custom_fields_value->id, 'left');
-                $i++;
-            }
-        }
-
-        $field_variable = implode(',', $field_var_array);
-
-        $this->db->select('income_head.income_category,sum(income.amount) as total_amount,'.$field_variable)->from('income');
-        $this->db->join('income_head', 'income.inc_head_id = income_head.id');
-        $this->db->where('table_custom_1.field_value =', 'PAGADO COMPLETO');
-        $this->db->group_by('income.inc_head_id');
-        $query = $this->db->get();
-        return $query->result_array();
     }
 
     public function getDatatable()
@@ -84,7 +53,7 @@ class Expense extends Admin_Controller
             foreach ($dt_response->data as $key => $value) {
 
                 $row = array();
-                //====================================
+//====================================
                 $column_first = '<a href="#" data-toggle="popover" class="detail_popover">' . $value->name . '</a>';
                 $column_first .= '<div class="rowoptionview rowview-mt-19">';
 
@@ -93,40 +62,21 @@ class Expense extends Admin_Controller
                     $column_first .= '<a href="' . base_url() . 'admin/expense/download/' . $value->documents . '" class="btn btn-default btn-xs"  data-toggle="tooltip" title="' . $this->lang->line('download') . '"><i class="fa fa-download"></i></a>';
                 }
 
-                if ($value->documents_other) {
+                if ($this->rbac->hasPrivilege('expense', 'can_edit')) {
 
-                    $column_first .= '<a href="' . base_url() . 'admin/expense/download/' . $value->documents_other . '" class="btn btn-default btn-xs"  data-toggle="tooltip" title="' . $this->lang->line('evidence') . '"><i class="fa fa-download"></i></a>';
+                    $column_first .= '<a  onclick="edit(' . $value->id . ')" class="btn btn-default btn-xs"  data-toggle="tooltip" title="' . $this->lang->line('edit') . '"> <i class="fa fa-pencil"></i> </a>';
                 }
+                if ($this->rbac->hasPrivilege('expense', 'can_delete')) {
 
-                // validar pago end 
-                if (!empty($fields)) {
-                    foreach ($fields as $fields_key => $fields_value) {
-                        if (($fields_value->id == 25) != ($value->{"$fields_value->name"} == 'PAGADO') ){
-                            if ($this->rbac->hasPrivilege('expense', 'can_edit')) {
-
-                                $column_first .= '<a  onclick="edit(' . $value->id . ')" class="btn btn-default btn-xs"  data-toggle="tooltip" title="' . $this->lang->line('edit') . '"> <i class="fa fa-pencil"></i> </a>';
-                            }
-
-                            if ($this->rbac->hasPrivilege('expense', 'can_edit')) {
-
-                                $column_first .= '<a  onclick="edit_status(' . $value->id . ')" class="btn btn-default btn-xs"  data-toggle="tooltip" title="' . $this->lang->line('edit_status') . '"> <i class="fa fa-pencil"></i> </a>';
-                            }
-                            if ($this->rbac->hasPrivilege('expense', 'can_delete')) {
-
-                                $column_first .= '<a class="btn btn-default btn-xs"  data-toggle="tooltip" title="' . $this->lang->line('delete') . '" onclick="delete_record(' . $value->id . ')"><i class="fa fa-trash"></i></a>';
-                            }
-                        }
-                    }
+                    $column_first .= '<a class="btn btn-default btn-xs"  data-toggle="tooltip" title="' . $this->lang->line('delete') . '" onclick="delete_record(' . $value->id . ')"><i class="fa fa-trash"></i></a>';
                 }
-
-                // end 
                 $column_first .= '</div>';
-
                 $column_first .= '<div class="fee_detail_popover" style="display: none">';
 
                 if ($value->note == "") {
 
                     $column_first .= '<p class="text text-danger">' . $this->lang->line('no_description') . '</p>';
+
                 } else {
 
                     $column_first .= '<p class="text text-info">' . $value->note . '</p>';
@@ -146,10 +96,8 @@ class Expense extends Admin_Controller
                         $display_field = $value->{"$fields_value->name"};
                         if ($fields_value->type == "link") {
                             $display_field = "<a href=" . $value->{"$fields_value->name"} . " target='_blank'>" . $value->{"$fields_value->name"} . "</a>";
-                        }
 
-                        // $style = '<span style="background: #77a6ea; text-align: center; border-radius: 10px;">'.  .'</span>';
-                        // $row[] = '<span style="background: #77a6ea; text-align: center; border-radius: 30px;">'.$display_field.'</span>';
+                        }
                         $row[] = $display_field;
                     }
                 }
@@ -158,7 +106,6 @@ class Expense extends Admin_Controller
                 $dt_data[] = $row;
             }
         }
-
         $json_data = array(
             "draw"            => intval($dt_response->draw),
             "recordsTotal"    => intval($dt_response->recordsTotal),
@@ -185,7 +132,6 @@ class Expense extends Admin_Controller
         $this->form_validation->set_rules('name', $this->lang->line('name'), 'trim|required|xss_clean');
         $this->form_validation->set_rules('exdate', $this->lang->line('date'), 'trim|required|xss_clean');
         $this->form_validation->set_rules('documents', $this->lang->line('documents'), 'callback_handle_upload');
-        // $this->form_validation->set_rules('income_id', $this->lang->line('income'), 'trim|required|xss_clean');
         if ($this->form_validation->run() == false) {
             $msg = array(
                 'exp_head_id' => form_error('exp_head_id'),
@@ -193,7 +139,6 @@ class Expense extends Admin_Controller
                 'date'        => form_error('date'),
                 'amount'      => form_error('amount'),
                 'documents'   => form_error('documents'),
-                // 'income_id'     => form_error('income_id'),
             );
             if (!empty($custom_fields)) {
                 foreach ($custom_fields as $custom_fields_key => $custom_fields_value) {
@@ -222,11 +167,9 @@ class Expense extends Admin_Controller
                 'note'         => $this->input->post('description'),
                 'documents'    => $this->input->post('documents'),
                 'generated_by' => $this->customlib->getLoggedInUserID(),
-                // 'income_id'       => $this->input->post('income_id')
             );
             $custom_field_post  = $this->input->post("custom_fields[expenses]");
             $custom_value_array = array();
-            
             if (!empty($custom_field_post)) {
                 foreach ($custom_field_post as $key => $value) {
                     $check_field_type = $this->input->post("custom_fields[expenses][" . $key . "]");
@@ -240,21 +183,6 @@ class Expense extends Admin_Controller
                 }
             }
             $insert_id = $this->expense_model->add($data);
-
-            $array_custom  = array(
-                'belong_table_id' => 0,
-                'custom_field_id' => 25,
-                'field_value'     => 'RECIBIDO',
-            );
-            $custom_value_array[] = $array_custom;
-
-            $array_custom  = array(
-                'belong_table_id' => 0,
-                'custom_field_id' => 26,
-                'field_value'     => 'No',
-            );
-            $custom_value_array[] = $array_custom;
-
             if (!empty($custom_value_array)) {
                 $this->customfield_model->insertRecord($custom_value_array, $insert_id);
             }
@@ -266,14 +194,6 @@ class Expense extends Admin_Controller
                 $data_img = array('id' => $insert_id, 'documents' => 'uploads/hospital_expense/' . $img_name);
                 $this->expense_model->add($data_img);
             }
-
-            // if (isset($_FILES["documents_other"]) && !empty($_FILES['documents_other']['name'])) {
-            //     $fileInfo = pathinfo($_FILES["documents_other"]["name"]);
-            //     $img_name = $insert_id.'-other.' . $fileInfo['extension'];
-            //     move_uploaded_file($_FILES["documents_other"]["tmp_name"], "./uploads/hospital_expense/" . $img_name);
-            //     $data_img = array('id' => $insert_id, 'documents_other' => 'uploads/hospital_expense/' . $img_name);
-            //     $this->expense_model->add($data_img);
-            // }
             $array = array('status' => 'success', 'error' => '', 'message' => $this->lang->line('success_message'));
         }
         echo json_encode($array);
@@ -374,30 +294,7 @@ class Expense extends Admin_Controller
         $data['title_list']  = $this->lang->line('fees_master_list');
         $expnseHead          = $this->expensehead_model->get();
         $data['expheadlist'] = $expnseHead;
-
-        $incomeHead          = $this->income_model->get();
-        $data['incomelist'] = $incomeHead;
-
-        // $data['amount_income'] = $this->getTotal()[0]['total_amount'];
-        if (!empty($this->getTotal()) ) {
-            $data['amount_income'] = $this->getTotal()[0]['total_amount'];
-        } else {
-            $data['amount_income'] = 0;
-        }
-
         $this->load->view('admin/expense/editexpenseModal', $data);
-    }
-
-    public function getDataByidForStatus($id)
-    {
-        $data['title']       = $this->lang->line('edit_fees_master');
-        $data['id']          = $id;
-        $expense             = $this->expense_model->get($id);
-        $data['expense']     = $expense;
-        $data['title_list']  = $this->lang->line('fees_master_list');
-        $expnseHead          = $this->expensehead_model->get();
-        $data['expheadlist'] = $expnseHead;
-        $this->load->view('admin/expense/editexpenseModalStatus', $data);
     }
 
     public function edit($id)
@@ -423,6 +320,7 @@ class Expense extends Admin_Controller
                     $custom_fields_name = $custom_fields_value['name'];
 
                     $this->form_validation->set_rules("custom_fields[expenses][" . $custom_fields_id . "]", $custom_fields_name, 'trim|required');
+
                 }
             }
         }
@@ -431,7 +329,6 @@ class Expense extends Admin_Controller
         $this->form_validation->set_rules('amount', $this->lang->line('amount'), 'trim|required|xss_clean');
         $this->form_validation->set_rules('name', $this->lang->line('name'), 'trim|required|xss_clean');
         $this->form_validation->set_rules('date', $this->lang->line('date'), 'trim|required|xss_clean');
-        // $this->form_validation->set_rules('income_id', $this->lang->line('income'), 'trim|required|xss_clean');
         if ($this->form_validation->run() == false) {
             $msg = array(
                 'exp_head_id' => form_error('exp_head_id'),
@@ -439,7 +336,6 @@ class Expense extends Admin_Controller
                 'name'        => form_error('name'),
                 'date'        => form_error('date'),
                 'documents'   => form_error('documents'),
-                // 'income_id'     => form_error('income_id'),
             );
 
             if (!empty($custom_fields)) {
@@ -469,7 +365,6 @@ class Expense extends Admin_Controller
                 'amount'       => $this->input->post('amount'),
                 'note'         => $this->input->post('description'),
                 'generated_by' => $this->customlib->getLoggedInUserID(),
-                // 'income_id'       => $this->input->post('income_id')
             );
             $insert_id = $this->expense_model->add($data);
             if (!empty($custom_fields)) {
@@ -485,7 +380,6 @@ class Expense extends Admin_Controller
                 }
                 $this->customfield_model->updateRecord($custom_value_array, $id, 'expenses');
             }
-
             if (isset($_FILES["documents"]) && !empty($_FILES['documents']['name'])) {
                 $fileInfo = pathinfo($_FILES["documents"]["name"]);
                 $img_name = $id . '.' . $fileInfo['extension'];
@@ -493,143 +387,6 @@ class Expense extends Admin_Controller
                 $data_img = array('id' => $id, 'documents' => 'uploads/hospital_expense/' . $img_name);
                 $this->expense_model->add($data_img);
             }
-
-            if (isset($_FILES["documents_other"]) && !empty($_FILES['documents_other']['name'])) {
-                $fileInfo = pathinfo($_FILES["documents_other"]["name"]);
-                $img_name = $id.'-other' . '.' . $fileInfo['extension'];
-                move_uploaded_file($_FILES["documents_other"]["tmp_name"], "./uploads/hospital_expense/" . $img_name);
-                $data_img = array('id' => $id, 'documents_other' => 'uploads/hospital_expense/' . $img_name);
-                $this->expense_model->add($data_img);
-                
-                $array_custom     = array(
-                        'belong_table_id' => $id,
-                        'custom_field_id' => 25,
-                        'field_value'     => 'PENDIENTE',
-                );
-                $custom_value_array[] = $array_custom;
-
-                $array_custom  = array(
-                    'belong_table_id' => $id,
-                    'custom_field_id' => 26,
-                    'field_value'     => 'Si',
-                );
-                $custom_value_array[] = $array_custom;
-
-                $this->customfield_model->updateRecord($custom_value_array, $id, 'expenses');
-            }
-
-            if ($custom_field_post[25] == 'PAGADO'){
-                // $id_income = $this->input->post('income_id');
-                // $income  = $this->income_model->get($id_income);
-
-                if ($this->input->post('amount') > $this->input->post('amount_income')){
-                    $array_custom     = array(
-                        'belong_table_id' => $id,
-                        'custom_field_id' => 25,
-                        'field_value'     => 'PENDIENTE',
-                    );
-                    $custom_value_array[] = $array_custom;
-
-                    $this->customfield_model->updateRecord($custom_value_array, $id, 'expenses');
-                }
-            }
-
-            $array = array('status' => 'success', 'error' => '', 'message' => $this->lang->line('expense_edit_successfully'));
-        }
-        echo json_encode($array);
-    }
-
-    public function edit_status($id)
-    {
-        if (!$this->rbac->hasPrivilege('expense', 'can_edit')) {
-            access_denied();
-        }
-        
-        $data['id']          = $id;
-        $expense             = $this->expense_model->get($id);
-        $data['expense']     = $expense;
-
-        $custom_fields = $this->customfield_model->getByBelong('expenses');
-
-       
-        if (!empty($custom_fields)) {
-            foreach ($custom_fields as $custom_fields_key => $custom_fields_value) {
-                if ($custom_fields_value['validation']) {
-                    $custom_fields_id   = $custom_fields_value['id'];
-                    $custom_fields_name = $custom_fields_value['name'];
-
-                    $this->form_validation->set_rules("custom_fields[expenses][" . $custom_fields_id . "]", $custom_fields_name, 'trim|required');
-                }
-            }
-        }
-
-        $this->form_validation->set_rules('name', $this->lang->line('name'), 'trim|required|xss_clean');
-        
-        if ($this->form_validation->run() == false) {
-            $msg = array(
-                'name'        => form_error('name')
-            );
-
-            if (!empty($custom_fields)) {
-                foreach ($custom_fields as $custom_fields_key => $custom_fields_value) {
-                    if ($custom_fields_value['validation']) {
-                        $custom_fields_id                                                 = $custom_fields_value['id'];
-                        $custom_fields_name                                               = $custom_fields_value['name'];
-                        $error_msg2["custom_fields[expenses][" . $custom_fields_id . "]"] = form_error("custom_fields[expenses][" . $custom_fields_id . "]");
-                    }
-                }
-            }
-            if (!empty($error_msg2)) {
-                $error_msg = array_merge($msg, $error_msg2);
-            } else {
-                $error_msg = $msg;
-            }
-            $array = array('status' => 'fail', 'error' => $error_msg, 'message' => '');
-        } else {
-            $custom_field_post = $this->input->post("custom_fields[expenses]");
-            $data              = array(
-                'id'           => $id,
-                'generated_by' => $this->customlib->getLoggedInUserID(),
-            );
-            $insert_id = $this->expense_model->add($data);
-            if (!empty($custom_fields)) {
-                foreach ($custom_field_post as $key => $value) {
-                    $check_field_type = $this->input->post("custom_fields[expenses][" . $key . "]");
-                    $field_value      = is_array($check_field_type) ? implode(",", $check_field_type) : $check_field_type;
-                    $array_custom     = array(
-                        'belong_table_id' => $id,
-                        'custom_field_id' => $key,
-                        'field_value'     => $field_value,
-                    );
-                    $custom_value_array[] = $array_custom;
-                }
-                $this->customfield_model->updateRecord($custom_value_array, $id, 'expenses');
-            }            
-
-            if (isset($_FILES["documents_other"]) && !empty($_FILES['documents_other']['name'])) {
-                $fileInfo = pathinfo($_FILES["documents_other"]["name"]);
-                $img_name = $id.'-other' . '.' . $fileInfo['extension'];
-                move_uploaded_file($_FILES["documents_other"]["tmp_name"], "./uploads/hospital_expense/" . $img_name);
-                $data_img = array('id' => $id, 'documents_other' => 'uploads/hospital_expense/' . $img_name);
-                $this->expense_model->add($data_img);
-                
-                $array_custom     = array(
-                        'belong_table_id' => $id,
-                        'custom_field_id' => 25,
-                        'field_value'     => 'PENDIENTE',
-                );
-                $custom_value_array[] = $array_custom;
-
-                $array_custom  = array(
-                    'belong_table_id' => $id,
-                    'custom_field_id' => 26,
-                    'field_value'     => 'Si',
-                );
-                $custom_value_array[] = $array_custom;
-
-                $this->customfield_model->updateRecord($custom_value_array, $id, 'expenses');
-            }
-
             $array = array('status' => 'success', 'error' => '', 'message' => $this->lang->line('expense_edit_successfully'));
         }
         echo json_encode($array);
@@ -655,13 +412,13 @@ class Expense extends Admin_Controller
         }
         if (empty($search_type)) {
             $search_type = "";
-            $listMessage = $this->report_model->getReport($table_name, $select, $join);
+            $listMessage = $this->report_model->getReport($table_name,$select, $join);
         } else {
             $search_table     = "expenses";
             $search_column    = "date";
             $additional       = array();
             $additional_where = array();
-            $listMessage      = $this->report_model->searchReport($table_name, $select, $join, $search_type, $search_table, $search_column);
+            $listMessage      = $this->report_model->searchReport($table_name,$select, $join, $search_type, $search_table, $search_column);
         }
         $data['resultList']  = $listMessage;
         $data["searchlist"]  = $this->search_type;
@@ -709,6 +466,7 @@ class Expense extends Admin_Controller
 
             $start_date = $this->customlib->dateFormatToYYYYMMDD($search['date_from']);
             $end_date   = $this->customlib->dateFormatToYYYYMMDD($search['date_to']);
+
         } else {
 
             if (isset($search['search_type']) && $search['search_type'] != '') {
@@ -721,6 +479,7 @@ class Expense extends Admin_Controller
 
             $start_date = $dates['from_date'];
             $end_date   = $dates['to_date'];
+
         }
 
         $reportdata   = $this->transaction_model->expensereportRecord($start_date, $end_date);
@@ -742,6 +501,7 @@ class Expense extends Admin_Controller
                         $display_field = $value->{"$fields_value->name"};
                         if ($fields_value->type == "link") {
                             $display_field = "<a href=" . $value->{"$fields_value->name"} . " target='_blank'>" . $value->{"$fields_value->name"} . "</a>";
+
                         }
                         $row[] = $display_field;
                     }
@@ -773,7 +533,7 @@ class Expense extends Admin_Controller
         );
         echo json_encode($json_data);
     }
-
+    
     public function expensegroup()
     {
         $this->session->set_userdata('top_menu', 'Reports');
@@ -833,10 +593,12 @@ class Expense extends Admin_Controller
 
             $dates               = $this->customlib->get_betweendate($_POST['search_type']);
             $data['search_type'] = $_POST['search_type'];
+
         } else {
 
             $dates               = $this->customlib->get_betweendate('this_year');
             $data['search_type'] = '';
+
         }
 
         $data['head_id'] = $head_id = "";
@@ -889,6 +651,7 @@ class Expense extends Admin_Controller
                         $display_field = $value->{"$fields_value->name"};
                         if ($fields_value->type == "link") {
                             $display_field = "<a href=" . $value->{"$fields_value->name"} . " target='_blank'>" . $value->{"$fields_value->name"} . "</a>";
+
                         }
                         $row[] = $display_field;
                     }
@@ -908,15 +671,16 @@ class Expense extends Admin_Controller
                     $amount_row[] = "";
                     $amount_row[] = "";
                     if (!empty($fields)) {
-                        foreach ($fields as $fields_key => $fields_value) {
+                foreach ($fields as $fields_key => $fields_value) {
 
-                            $amount_row[] = "";
-                        }
-                    }
+                    $amount_row[] = "";
+                }
+            }
                     $amount_row[] = "<b>" . $this->lang->line('subtotal') . "</b>";
                     $amount_row[] = "<b>" . $currency_symbol . $sub_total . "</b>";
                     $dt_data[]    = $amount_row;
                 }
+
             }
 
             $grand_total  = "<b>" . $currency_symbol . $grd_total . "</b>";

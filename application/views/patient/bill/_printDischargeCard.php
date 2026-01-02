@@ -90,7 +90,7 @@ $currency_symbol = $this->customlib->getHospitalCurrencyFormat();
                                         <th ><?php echo $this->lang->line('opd_no'); ?></th>
                                         <td ><?php
                                             if($result['opdid']!='' && $result['opdid']!=0){
-                                                echo $this->customlib->getSessionPrefixByType('DAR-FO').$result['opdid'];
+                                                echo $this->customlib->getSessionPrefixByType('opd_no').$result['opdid'];
                                             }
                                             
                                              

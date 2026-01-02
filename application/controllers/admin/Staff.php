@@ -879,14 +879,6 @@ class Staff extends Admin_Controller
             $alloted_leave = $this->input->post("alloted_leave");
             $altid         = $this->input->post("altid");
 
-/*
-             var_dump($role_data );
-            die();
-
-            
-            
-            */
-
             if(!empty($leave_type)){
                 $i = 0;
                 foreach ($leave_type as $key => $value) {

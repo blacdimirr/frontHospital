@@ -184,13 +184,13 @@ $genderList = $this->customlib->getGender();
                                         <div class="col-sm-2 col-xs-4">
                                             <div class="form-group">
                                                 <label for="pwd"><?php echo $this->lang->line('height'); ?></label> 
-                                                <input name="height" type="number" min="1" class="form-control" />
+                                                <input name="height" type="text" class="form-control" />
                                             </div>
                                         </div>
                                         <div class="col-sm-2 col-xs-4">
                                             <div class="form-group">
                                                 <label for="pwd"><?php echo $this->lang->line('weight'); ?></label> 
-                                                <input name="weight" type="number" min="1" class="form-control" />
+                                                <input name="weight" type="text" class="form-control" />
                                             </div>
                                         </div>
                                         <div class="col-sm-2 col-xs-4">
@@ -199,7 +199,7 @@ $genderList = $this->customlib->getGender();
                                                 <input name="bp" type="text" class="form-control" />
                                             </div>
                                         </div>
-                                        <div class="col-sm-2 col-xs-4" style="display: none;">
+                                        <div class="col-sm-2 col-xs-4">
                                             <div class="form-group">
                                                 <label for="pwd"><?php echo $this->lang->line('pulse'); ?></label> 
                                                 <input name="pulse" type="text" class="form-control" />
@@ -533,13 +533,13 @@ $genderList = $this->customlib->getGender();
                                             <div class="col-sm-2 col-xs-4">
                                                 <div class="form-group">
                                                     <label for="pwd"><?php echo $this->lang->line('height'); ?></label> 
-                                                    <input name="height" id="eheight" type="number" min="1" class="form-control" />
+                                                    <input name="height" id="eheight" type="text" class="form-control" />
                                                 </div>
                                             </div>
                                             <div class="col-sm-2 col-xs-4">
                                                 <div class="form-group">
                                                     <label for="pwd"><?php echo $this->lang->line('weight'); ?></label> 
-                                                    <input name="weight" id="eweight" type="number" min="1" class="form-control" />
+                                                    <input name="weight" id="eweight" type="text" class="form-control" />
                                                 </div>
                                             </div>
                                             <div class="col-sm-2 col-xs-4">
@@ -548,7 +548,7 @@ $genderList = $this->customlib->getGender();
                                                     <input name="bp" id="ebp" type="text" class="form-control" />
                                                 </div>
                                             </div>
-                                            <div class="col-sm-2 col-xs-4" style="display: none;">
+                                            <div class="col-sm-2 col-xs-4">
                                                 <div class="form-group">
                                                     <label for="pwd"><?php echo $this->lang->line('pulse'); ?></label> 
                                                     <input name="pulse" id="epulse" type="text" class="form-control" />
@@ -1120,23 +1120,6 @@ $genderList = $this->customlib->getGender();
     ?>
 </script>  
 <script>
-    function calcularASC() {
-        let height = parseFloat($('input[name="height"]').val());
-        let weight = parseFloat($('input[name="weight"]').val());
-
-        if (!isNaN(height) && !isNaN(weight)) {
-            let resultado = (weight * height) / 3600;
-            resultado = resultado.toFixed(3);
-            $('#_asc').val(resultado);
-        } else {
-            $('#_asc').val('');
-        }
-    }
-
-    $(document).on('input', 'input[name="height"], input[name="weight"]', function() {
-        calcularASC();
-    });
-
     function holdModal(modalId) {
         $('#' + modalId).modal({
             backdrop: 'static',

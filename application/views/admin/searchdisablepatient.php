@@ -218,7 +218,7 @@ $marital_status = $this->config->item('marital_status');
                                                 </div>
                                                <div class="col-sm-5" id="calculate">
                                                     <div class="form-group">
-                                                        <label><?php echo $this->lang->line('age'); ?></label><small class="req"> *</small> 
+                                                        <label><?php echo $this->lang->line('age').' ('.$this->lang->line('yy_mm_dd').')'; ?></label><small class="req"> *</small> 
                                                         <div style="clear: both;overflow: hidden;">
                                                             <input type="text" placeholder="<?php echo $this->lang->line('year'); ?>" name="age[year]" id="age_year" value="" class="form-control patient_age_year" style="width: 30%; float: left;">
 

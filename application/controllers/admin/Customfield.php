@@ -50,7 +50,6 @@ class Customfield extends Admin_Controller
                 'visible_on_print'         => isset($_POST['display_print']) ? $_POST['display_print'] : "",
                 'visible_on_report'        => isset($_POST['display_report']) ? $_POST['display_report'] : "",
                 'visible_on_patient_panel' => isset($_POST['display_patient']) ? $_POST['display_patient'] : "",
-                'visible_is_custom' => isset($_POST['display_is_custom']) ? $_POST['display_is_custom'] : "",
             );
             $this->customfield_model->add($data);
             $this->session->set_flashdata('msg', '<div class="alert alert-success text-left">' . $this->lang->line('success_message') . '</div>');
@@ -100,7 +99,6 @@ class Customfield extends Admin_Controller
                 'visible_on_print'         => isset($_POST['display_print']) ? $_POST['display_print'] : "",
                 'visible_on_report'        => isset($_POST['display_report']) ? $_POST['display_report'] : "",
                 'visible_on_patient_panel' => isset($_POST['display_patient']) ? $_POST['display_patient'] : "",
-                'visible_is_custom' => isset($_POST['display_is_custom']) ? $_POST['display_is_custom'] : "",
             );
             $this->customfield_model->add($data);
             $this->session->set_flashdata('msg', '<div class="alert alert-success text-left">' . $this->lang->line('update_message') . '</div>');

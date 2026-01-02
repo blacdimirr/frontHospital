@@ -16,12 +16,7 @@ class Prescription extends Admin_Controller
         $this->payment_mode   = $this->config->item('payment_mode');
         $this->blood_group    = $this->config->item('bloodgroup');
         $this->load->model('prefix_model');
-        // 
-        $this->load->library('Customlib');
-        $this->load->helper('customfield_helper');
-        $this->load->helper('custom');
-        // 
-        $this->opd_prefix = $this->prefix_model->getByCategory(array('DAR-FO'))[0]->prefix;
+        $this->opd_prefix = $this->prefix_model->getByCategory(array('opd_no'))[0]->prefix;
         $this->load->model('finding_model');
     }
 
@@ -30,133 +25,18 @@ class Prescription extends Admin_Controller
         $visitid               = $this->input->get('visitid');
         $data["print_details"] = $this->printing_model->getheaderfooter('opdpre');
         $result                = $this->prescription_model->getPrescriptionByVisitID($visitid);
-
-        $result_custom         = $this->patient_model->getopdvisitDetailsbyvisitid($visitid);
-        $data["result_custom"] = $result_custom;
-        $data['fields'] = $this->customfield_model->get_custom_fields('opd', '', '', '', '');
-
         $data["result"]        = $result;
 
         $data["id"]     = $visitid;
         $data["opd_id"] = $result->opd_detail_id;
-        $data["camas"] = $this->patient_model->get_case_reference_id($result->case_reference_id);
-
-        $page           = $this->load->view('admin/patient/prescription', $data, true);
-        // $page           = $this->load->view('admin/patient/_printprescription', $data, true);
+        $page           = $this->load->view('admin/patient/_printprescription', $data, true);
         echo json_encode(array('status' => 1, 'page' => $page));
-    }
-
-    public function print_medicamentos()
-    {   
-        // $data["print_details"] = $this->printing_model->getheaderfooter('opdpre');
-        // $result_custom         = $this->patient_model->getopdvisitDetailsbyvisitid($visitid);
-        // $data["result_custom"] = $result_custom;
-        // $data['fields'] = $this->customfield_model->get_custom_fields('opd', '', '', '', '');        
-        // $data["id"]     = $visitid;
-        // $data["opd_id"] = $result->opd_detail_id;
-        // $data["result"]        = $result;
-        // $result                = $this->prescription_model->getPrescriptionByVisitID($ipd_id);
-        
-        $ipd_id               = $this->input->get('ipd_id');
-        $id               = $this->input->get('id');
-
-        $ipd_id_details = $this->prescription_model->get_hoja_ingreso_by_ipd_details($ipd_id);
-        // $data['result'] = $this->prescription_model->get_hoja_ingreso_by_ipd($ipd_id);
-        $data['result'] = $this->prescription_model->get_hoja_ingreso_by_ipd_details_2($ipd_id);
-        // $data['medicines'] = $this->prescription_model->get_hoja_ingreso_by_ipd_details_2($ipd_id);
-
-        if ($id == 1) {
-            $data['medicines'] = $this->patient_model->getmedicationdetailsbydate_overview($ipd_id);
-        } else {
-            $data['medicines'] = $this->patient_model->getmedicationdetailsbydate_overview_2($ipd_id);
-        }
-
-        $data["camas"] = $this->patient_model->get_case_reference_id($ipd_id_details['case_reference_id']);
-
-        
-
-        $page           = $this->load->view('admin/patient/prescriptionMedicamentos', $data, true);
-        // $page           = $this->load->view('admin/patient/_printprescription', $data, true);
-        echo json_encode(array('status' => 1, 'page' => $page));
-    }
-
-    public function printHojaInterconsulta()
-    {
-        $opd_details_id               = $this->input->post('opd_details_id');
-        $visitid               = $this->input->get('visitid');
-        $visit_id               = $this->input->get('visit_id');
-
-        // $data["print_details"] = $this->printing_model->getheaderfooter('opdpre');
-        $result                = $this->prescription_model->getPrescriptionByVisitInterconsultaID($visitid);
-        $data["result"]        = $result;
-        $data["patient"]        = $result;
-        $data['patientCustom'] = $this->patient_model->getpatientsByArray(array($result->id))[0];
-        
-        $data["id"]     = $visitid;
-        $data["opd_id"] = $result->opd_detail_id;
-        
-
-        $page           = $this->load->view('admin/patient/_print_formulario_interconsulta', $data, true);
-        echo json_encode(array('status' => 1, 'page' => $page));
-    }
-    public function printHojaIngreso()
-    {
-        $opd_details_id               = $this->input->post('opd_details_id');
-        $visitid               = $this->input->get('visitid');
-        $visit_id               = $this->input->get('visit_id');
-
-        // $data["print_details"] = $this->printing_model->getheaderfooter('opdpre');
-        $result                = $this->prescription_model->getPrescriptionByVisitHojaIngresoID($visitid);
-        $data["result"]        = $result;
-        $data["patient"]        = $result;
-        $data['patientCustom'] = $this->patient_model->getpatientsByArray(array($result->id))[0];
-        
-        $data["id"]     = $visitid;
-        $data["opd_id"] = $result->opd_detail_id;
-        
-
-        $page           = $this->load->view('admin/patient/hoja_ingreso_print', $data, true);
-        echo json_encode(array('status' => 1, 'page' => $page));
-    }
-
-    public function getPrescriptionId($prescription_id)
-    {
-        $result                = $this->prescription_model->getPrescriptionById($prescription_id);
-        $data["result"]        = $result;       
-
-        $result_custom         = $this->patient_model->getopdvisitDetailsbyvisitid($result->visitid);
-        $data["result_custom"] = $result_custom;
-
-        $data["print_details"] = $this->printing_model->getheaderfooter('opdpre');
-        $data["id"]            = $result->visitid;
-        $data["opd_id"]        = $result->opd_detail_id;
-        if (isset($_POST['print'])) {
-            $data["print"] = 'yes';
-        } else {
-            $data["print"] = 'no';
-        }
-
-        // print_r($data["result"]->visitid);
-        // die();
-
-        // $result                        = $this->patient_model->getopdvisitDetailsbyvisitid($visitid);
-        // $data['custom_fields_value'] = display_custom_fields('opd', $result->opd_detail_id);
-        $data['fields'] = $this->customfield_model->get_custom_fields('opd', '', '', '', '');
-
-        $data["camas"] = $this->patient_model->get_case_reference_id($result->case_reference_id);
-
-        // $this->load->view("admin/patient/prescription-old", $data);
-        $this->load->view("admin/patient/prescription", $data);
     }
 
     public function getPrescription($visitid)
     {
         $result                = $this->prescription_model->getPrescriptionByVisitID($visitid);
         $data["result"]        = $result;
-
-        $result_custom         = $this->patient_model->getopdvisitDetailsbyvisitid($visitid);
-        $data["result_custom"] = $result_custom;
-
         $data["print_details"] = $this->printing_model->getheaderfooter('opdpre');
         $data["id"]            = $visitid;
         $data["opd_id"]        = $result->opd_detail_id;
@@ -166,81 +46,7 @@ class Prescription extends Admin_Controller
             $data["print"] = 'no';
         }
 
-        // print_r($result->case_reference_id);
-        // die();
-
-        // $result                        = $this->patient_model->getopdvisitDetailsbyvisitid($visitid);
-        // $data['custom_fields_value'] = display_custom_fields('opd', $result->opd_detail_id);
-        $data['fields'] = $this->customfield_model->get_custom_fields('opd', '', '', '', '');
-
-        $data["camas"] = $this->patient_model->get_case_reference_id($result->case_reference_id);
-
-        // $this->load->view("admin/patient/prescription-old", $data);
         $this->load->view("admin/patient/prescription", $data);
-    }
-
-    public function editopdHojaIngreso($visitid)
-    {
-        $result                = $this->prescription_model->getPrescriptionByVisitHojaIngresoID($visitid);
-        $data["result"]        = $result;
-        $data["patient"]        = $result;        
-        
-        $data['patientCustom'] = $this->patient_model->getpatientsByArray(array($result->id))[0];
-        
-        $result_custom         = $this->patient_model->getopdvisitDetailsbyvisitid($visitid);
-        $data["result_custom"] = $result_custom;
-        
-        $data["print_details"] = $this->printing_model->getheaderfooter('opdpre');
-        $data["id"]            = $visitid;
-        // $data["opd_id"]        = $result->opd_detail_id;
-        
-        if (isset($_POST['print'])) {
-            $data["print"] = 'yes';
-        } else {
-            $data["print"] = 'no';
-        }
-
-        // print_r($visitid);
-        // die();
-
-        $data['fields'] = $this->customfield_model->get_custom_fields('opd', '', '', '', '');
-
-        $data["camas"] = $this->patient_model->get_case_reference_id($result->case_reference_id);
-
-        $page = $this->load->view('admin/patient/_edd_hoja_ingreso', $data, true); 
-        echo json_encode(array('status' => 1, 'page' => $page));
-    }
-
-    public function editopdFomrularioInterconsulta($visitid)
-    {
-        $result                = $this->prescription_model->getPrescriptionByVisitInterconsultaID($visitid);
-        $data["result"]        = $result;
-        $data["patient"]        = $result;        
-        
-        $data['patientCustom'] = $this->patient_model->getpatientsByArray(array($result->id))[0];
-        
-        $result_custom         = $this->patient_model->getopdvisitDetailsbyvisitid($visitid);
-        $data["result_custom"] = $result_custom;
-        
-        $data["print_details"] = $this->printing_model->getheaderfooter('opdpre');
-        $data["id"]            = $visitid;
-        $data["formulario_interconsulta_id"]        = $result->formulario_interconsulta_id;
-        
-        if (isset($_POST['print'])) {
-            $data["print"] = 'yes';
-        } else {
-            $data["print"] = 'no';
-        }
-
-        // print_r($visitid);
-        // die();
-
-        $data['fields'] = $this->customfield_model->get_custom_fields('opd', '', '', '', '');
-
-        $data["camas"] = $this->patient_model->get_case_reference_id($result->case_reference_id);
-
-        $page = $this->load->view('admin/patient/_edit_formulario_interconsulta', $data, true); 
-        echo json_encode(array('status' => 1, 'page' => $page));
     }
 
     public function getPrescriptionmanual($visitid)
@@ -330,29 +136,42 @@ class Prescription extends Admin_Controller
         $this->load->view("admin/patient/edit_prescription", $data);
     }
 
-    public function addipdPrescription()
-    {
-        $ipd_id                    = $this->input->post('ipd_id');
-        $data['medicineCategory']  = $this->medicine_category_model->getMedicineCategory();
-        $data['intervaldosage']    = $this->medicine_dosage_model->getIntervalDosage();
-        $data['durationdosage']    = $this->medicine_dosage_model->getDurationDosage();
-        $data['medicineName']      = $this->pharmacy_model->getMedicineName();
-        $data['dosage']            = $this->medicine_dosage_model->getMedicineDosage();
-        $data['roles']             = $this->role_model->get();
-        $pathology                 = $this->pathology_model->getPathology();
-        $data['pathology']         = $pathology;
-        $radiology                 = $this->radio_model->getRadiology();
-        $data['radiology']         = $radiology;
-        $data['ipd_id']            = $ipd_id;
-        $findingresult             = $this->finding_model->getfindingcategory();
-        $data['findingresult']     = $findingresult;
-        $data['priscribe_list']    = $this->patient_model->getDoctorsipd($ipd_id);
-        $consultant_doctor         = $this->patient_model->get_patientidbyIpdId($ipd_id);
-        $data['consultant_doctor'] = $consultant_doctor;
+public function addipdPrescription()
+{
+    $ipd_id = $this->input->post('ipd_id');
 
+    if (empty($ipd_id)) {
+        echo json_encode(array('status' => 0, 'message' => 'IPD ID is required.'));
+        return;
+    }
+
+    try {
+        // Gather medicine-related data
+        $data['medicineCategory'] = $this->medicine_category_model->getMedicineCategory();
+        $data['intervaldosage'] = $this->medicine_dosage_model->getIntervalDosage();
+        $data['durationdosage'] = $this->medicine_dosage_model->getDurationDosage();
+        $data['medicineName'] = $this->pharmacy_model->getMedicineName();
+        $data['dosage'] = $this->medicine_dosage_model->getMedicineDosage();
+
+        // Gather other required data
+        $data['roles'] = $this->role_model->get();
+        $data['pathology'] = $this->pathology_model->getPathology();
+        $data['radiology'] = $this->radio_model->getRadiology();
+        $data['findingresult'] = $this->finding_model->getfindingcategory();
+        $data['priscribe_list'] = $this->patient_model->getDoctorsipd($ipd_id);
+        $data['consultant_doctor'] = $this->patient_model->get_patientidbyIpdId($ipd_id);
+
+        // Assign IPD ID to data array
+        $data['ipd_id'] = $ipd_id;
+
+        // Load view
         $page = $this->load->view('admin/patient/_addipdprescription', $data, true);
         echo json_encode(array('status' => 1, 'page' => $page));
+    } catch (Exception $e) {
+        // Handle exception and send error response
+        echo json_encode(array('status' => 0, 'message' => $e->getMessage()));
     }
+}
 
     public function addopdPrescription()
     {
@@ -370,123 +189,6 @@ class Prescription extends Admin_Controller
         $findingresult            = $this->finding_model->getfindingcategory();
         $data['findingtype']      = $findingresult;
         $page                     = $this->load->view('admin/patient/_addopdprescription', $data, true); 
-        echo json_encode(array('status' => 1, 'page' => $page));
-    }
-
-    public function addOrdenMedica()
-    {
-        $data['visit_details_id'] = $this->input->post('visit_detail_id');
-        $data['medicineCategory'] = $this->medicine_category_model->getMedicineCategory();
-        $data['intervaldosage']   = $this->medicine_dosage_model->getIntervalDosage();
-        $data['durationdosage']   = $this->medicine_dosage_model->getDurationDosage();
-        $data['medicineName']     = $this->pharmacy_model->getMedicineName();
-        $data['dosage']           = $this->medicine_dosage_model->getMedicineDosage();
-        $data['roles']            = $this->role_model->get();
-        $pathology                = $this->pathology_model->getPathology();
-        $data['pathology']        = $pathology;
-        $radiology                = $this->radio_model->getRadiology();
-        $data['radiology']        = $radiology;
-        $findingresult            = $this->finding_model->getfindingcategory();
-        $data['findingtype']      = $findingresult;
-        $page                     = $this->load->view('admin/patient/_add_orden_medica', $data, true); 
-        echo json_encode(array('status' => 1, 'page' => $page));
-    }
-
-    public function addhojaIngreso()
-    {
-        $data['visit_details_id'] = $this->input->post('visit_detail_id');
-        $data['case_reference_id'] = $this->input->post('case_reference_id');
-        $data['patient_id'] = $this->input->post('patientid');
-        $data['medicineCategory'] = $this->medicine_category_model->getMedicineCategory();
-        $data['intervaldosage']   = $this->medicine_dosage_model->getIntervalDosage();
-        $data['durationdosage']   = $this->medicine_dosage_model->getDurationDosage();
-        $data['medicineName']     = $this->pharmacy_model->getMedicineName();
-        $data['dosage']           = $this->medicine_dosage_model->getMedicineDosage();
-        $data['roles']            = $this->role_model->get();
-        $pathology                = $this->pathology_model->getPathology();
-        $data['pathology']        = $pathology;
-        $radiology                = $this->radio_model->getRadiology();
-        $data['radiology']        = $radiology;
-        $findingresult            = $this->finding_model->getfindingcategory();
-        $data['findingtype']      = $findingresult;
-
-        $data['patient'] = $this->patient_model->getDetailsopdByCaseId($data['case_reference_id']);
-        $data['patientCustom'] = $this->patient_model->getpatientsByArray(array($data['patient_id']))[0];
-        // $data['patient'] = $this->patient_model->getpatientbyid($data['patient_id']);
-
-        // print_r($data['patientCustom']->{'Lisatdo de ARS'});
-        // die();
-
-        $page                     = $this->load->view('admin/patient/_add_hoja_ingreso', $data, true); 
-        echo json_encode(array('status' => 1, 'page' => $page));
-    }
-
-    public function get_hoja_ingreso()
-    {
-        // hoja de ingreso para hospitalizacion
-        $ipd_id = $this->input->post('ipd_id');
-        
-        $ipd_id_details = $this->prescription_model->get_hoja_ingreso_by_ipd_details($ipd_id);
-        $data['result'] = $this->prescription_model->get_hoja_ingreso_by_ipd($ipd_id);
-
-        // if (!empty($data['result'])) {
-        //     $data['patient'] = $ipd_id_details;//$this->patient_model->getpatientbyid($data['result'][0]['patient_id']);
-        //     $data['patientCustom'] = $this->patient_model->getpatientsByArray(array($ipd_id_details['patient_id']))[0];
-        // } else {
-            $data['patient'] = $ipd_id_details;// $this->patient_model->getpatientbyid($ipd_id_details->patient_id);
-            $data['patientCustom'] = $this->patient_model->getpatientsByArray(array($ipd_id_details['patient_id']))[0];
-        // }
-
-        $page = $this->load->view('admin/patient/_add_hoja_ingreso_hospitalized', $data, true); 
-        echo json_encode(array('status' => 1, 'page' => $page));
-    }
-
-    public function print_hoja_ingreso()
-    {
-        $ipd_id = $this->input->get('ipd_id');
-        
-        $ipd_id_details = $this->prescription_model->get_hoja_ingreso_by_ipd_details($ipd_id);
-        $data['result'] = $this->prescription_model->get_hoja_ingreso_by_ipd($ipd_id);
-   
-        //  print_r($ipd_id);
-        // die();
-        $data['patient'] = $ipd_id_details;// $this->patient_model->getpatientbyid($ipd_id_details->patient_id);
-        $data['patientCustom'] = $this->patient_model->getpatientsByArray(array($ipd_id_details['patient_id']))[0];
-        
-        $data["id"]     = $ipd_id;
-        $data["opd_id"] = $ipd_id;
-        
-
-        $page           = $this->load->view('admin/patient/hoja_ingreso_print_hospitalized.php', $data, true);
-        echo json_encode(array('status' => 1, 'page' => $page));
-    }
-
-    public function addInterconsultation()
-    {
-        $data['visit_details_id'] = $this->input->post('visit_detail_id');
-        $data['case_reference_id'] = $this->input->post('case_reference_id');
-        $data['patient_id'] = $this->input->post('patientid');
-        $data['medicineCategory'] = $this->medicine_category_model->getMedicineCategory();
-        $data['intervaldosage']   = $this->medicine_dosage_model->getIntervalDosage();
-        $data['durationdosage']   = $this->medicine_dosage_model->getDurationDosage();
-        $data['medicineName']     = $this->pharmacy_model->getMedicineName();
-        $data['dosage']           = $this->medicine_dosage_model->getMedicineDosage();
-        $data['roles']            = $this->role_model->get();
-        $pathology                = $this->pathology_model->getPathology();
-        $data['pathology']        = $pathology;
-        $radiology                = $this->radio_model->getRadiology();
-        $data['radiology']        = $radiology;
-        $findingresult            = $this->finding_model->getfindingcategory();
-        $data['findingtype']      = $findingresult;
-
-        $data['patient'] = $this->patient_model->getDetailsopdByCaseId($data['case_reference_id']);
-        $data['patientCustom'] = $this->patient_model->getpatientsByArray(array($data['patient_id']))[0];
-        // $data['patient'] = $this->patient_model->getpatientbyid($data['patient_id']);
-
-        // print_r($data['patientCustom']->{'Lisatdo de ARS'});
-        // die();
-
-        $page                     = $this->load->view('admin/patient/_add_formulario_interconsulta', $data, true); 
         echo json_encode(array('status' => 1, 'page' => $page));
     }
 
@@ -541,8 +243,6 @@ class Prescription extends Admin_Controller
         $data["prescription_id"]  = $prescription_id;
         $findingresult            = $this->finding_model->getfindingcategory();
         $data['findingresult']    = $findingresult;
-
-        $data['custom_fields_value'] = display_custom_fields('opd', $result->opd_details_id);
 
         $page = $this->load->view('admin/patient/_editopdprescription', $data, true);
         echo json_encode(array('status' => 1, 'page' => $page));

@@ -21,13 +21,13 @@ class Income_model extends MY_Model
     public function search($text = null, $start_date = null, $end_date = null)
     {
         if (!empty($text)) {
-            $this->db->select('income.id,income.date,income.name,income.invoice_no,income.amount,income.documents,income.note,income_head.income_category,income.inc_head_id,income.documents_other')->from('income');
+            $this->db->select('income.id,income.date,income.name,income.invoice_no,income.amount,income.documents,income.note,income_head.income_category,income.inc_head_id')->from('income');
             $this->db->join('income_head', 'income.inc_head_id = income_head.id');
             $this->db->like('income.name', $text);
             $query = $this->db->get();
             return $query->result_array();
         } else {
-            $this->db->select('income.id,income.date,income.name,income.invoice_no,income.amount,income.documents,income.note,income_head.income_category,income.inc_head_id,income.documents_other')->from('income');
+            $this->db->select('income.id,income.date,income.name,income.invoice_no,income.amount,income.documents,income.note,income_head.income_category,income.inc_head_id')->from('income');
             $this->db->join('income_head', 'income.inc_head_id = income_head.id');
             $this->db->where('income.date >=', $start_date);
             $this->db->where('income.date <=', $end_date);
@@ -38,8 +38,7 @@ class Income_model extends MY_Model
 
     public function get($id = null)
     {
-        $this->db->select('income.id,income.date,income.name,income.invoice_no,income.amount,income.documents,income.note,income_head.income_category,income.inc_head_id,income.documents_other')->from('income');
-        // $this->db->select('income.id,income.date,income.name,income.invoice_no,income.amount,income.documents,income.note,income_head.income_category,income.inc_head_id,income.expense_id')->from('income');
+        $this->db->select('income.id,income.date,income.name,income.invoice_no,income.amount,income.documents,income.note,income_head.income_category,income.inc_head_id')->from('income');
         $this->db->join('income_head', 'income.inc_head_id = income_head.id');
         if ($id != null) {
             $this->db->where('income.id', $id);
@@ -125,48 +124,6 @@ class Income_model extends MY_Model
             }
         } else {
             $this->db->insert('income', $data);
-            $insert_id = $this->db->insert_id();
-            $message = INSERT_RECORD_CONSTANT . " On Income id " . $insert_id;
-            $action = "Insert";
-            $record_id = $insert_id;
-            $this->log($message, $record_id, $action);
-            //======================Code End==============================
-            $this->db->trans_complete(); # Completing transaction
-            /* Optional */
-            if ($this->db->trans_status() === false) {
-                # Something went wrong.
-                $this->db->trans_rollback();
-                return false;
-            } else {
-                //return $return_value;
-            }
-            return $insert_id;
-        }
-    }
-    public function addIncomePayment($data)
-    {   
-        $this->db->trans_start(); # Starting Transaction
-        $this->db->trans_strict(false); # See Note 01. If you wish can remove as well
-        //=======================Code Start===========================
-        if (isset($data['id']) && $data['id'] != '') {
-            $this->db->where('id', $data['id']);
-            $this->db->update('income_payments', $data);
-            $message = UPDATE_RECORD_CONSTANT . " For Income id " . $data['id'];
-            $action = "Update";
-            $record_id = $data['id'];
-            $this->log($message, $record_id, $action);
-            //======================Code End==============================
-            $this->db->trans_complete(); # Completing transaction
-            /* Optional */
-            if ($this->db->trans_status() === false) {
-                # Something went wrong.
-                $this->db->trans_rollback();
-                return false;
-            } else {
-                return $record_id;
-            }
-        } else {
-            $this->db->insert('income_payments', $data);
             $insert_id = $this->db->insert_id();
             $message = INSERT_RECORD_CONSTANT . " On Income id " . $insert_id;
             $action = "Insert";
@@ -362,7 +319,7 @@ class Income_model extends MY_Model
         $custom_field_column = (empty($custom_field_column_array))? "": ",".implode(',', $custom_field_column_array);
 
         $this->datatables
-            ->select('income.id,income.date,income.name,income.invoice_no,income.amount,income.documents,income.note,income_head.income_category,income.inc_head_id,income.documents_other, (SELECT SUM(amount) FROM income_payments WHERE income_payments.income_id = income.id) as income_payments  ' . $field_variable)           
+            ->select('income.id,income.date,income.name,income.invoice_no,income.amount,income.documents,income.note,income_head.income_category,income.inc_head_id,' . $field_variable)           
             ->searchable('income.name,income.invoice_no,income.date,income.note,income_head.income_category'.$custom_field_column)
             ->orderable('income.name,income.invoice_no,income.date,income.note,income_head.income_category'.$custom_field_column)
             ->join('income_head', 'income.inc_head_id = income_head.id')

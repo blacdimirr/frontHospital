@@ -140,7 +140,7 @@ class Pharmacy extends Admin_Controller
                 array('check_exists', array($this->medicine_category_model, 'valid_medicine_name')),
             )
         );
-        // $this->form_validation->set_rules('medicine_category_id', $this->lang->line('medicine_category'), 'required');
+        $this->form_validation->set_rules('medicine_category_id', $this->lang->line('medicine_category'), 'required');
         $this->form_validation->set_rules('medicine_group', $this->lang->line('medicine_group'), 'required');
         $this->form_validation->set_rules('medicine_company', $this->lang->line('medicine_company'), 'required');
         $this->form_validation->set_rules('medicine_composition', $this->lang->line('medicine_composition'), 'required');
@@ -152,7 +152,7 @@ class Pharmacy extends Admin_Controller
             $msg = array(
                 'medicine_name'        => form_error('medicine_name'),
                 'medicine_group'       => form_error('medicine_group'),
-                // 'medicine_category_id' => form_error('medicine_category_id'),
+                'medicine_category_id' => form_error('medicine_category_id'),
                 'medicine_company'     => form_error('medicine_company'),
                 'medicine_composition' => form_error('medicine_composition'),
                 'unit'                 => form_error('unit'),
@@ -166,8 +166,7 @@ class Pharmacy extends Admin_Controller
 
             $pharmacy = array(
                 'medicine_name'        => $this->input->post('medicine_name'),
-                'medicine_category_id' => 1,
-                // 'medicine_category_id' => $this->input->post('medicine_category_id'),
+                'medicine_category_id' => $this->input->post('medicine_category_id'),
                 'medicine_company'     => $this->input->post('medicine_company'),
                 'medicine_composition' => $this->input->post('medicine_composition'),
                 'medicine_group'       => $this->input->post('medicine_group'),
@@ -194,8 +193,7 @@ class Pharmacy extends Admin_Controller
 
             $event_data = array(
                 'medicine_name'        => $this->input->post('medicine_name'),
-                'medicine_category'    => "",
-                // 'medicine_category'    => $category_name['medicine_category'],
+                'medicine_category'    => $category_name['medicine_category'],
                 'medicine_company'     => $this->input->post('medicine_company'),
                 'medicine_composition' => $this->input->post('medicine_composition'),
                 'medicine_group'       => $this->input->post('medicine_group'),
@@ -354,7 +352,7 @@ class Pharmacy extends Admin_Controller
                 $row[]     = $value->medicine_name . $action;
                 $row[]     = $value->medicine_company;
                 $row[]     = $value->medicine_composition;
-                // $row[]     = $value->medicine_category;
+                $row[]     = $value->medicine_category;
                 $row[]     = $value->medicine_group;
                 $row[]     = $value->unit;
                 $row[]     = $available_qty . $status;
@@ -765,7 +763,7 @@ class Pharmacy extends Admin_Controller
             access_denied();
         }
         $this->form_validation->set_rules('medicine_name', $this->lang->line('medicine_name'), 'trim|required|xss_clean');
-        // $this->form_validation->set_rules('medicine_category_id', $this->lang->line('medicine_category_id'), 'required');
+        $this->form_validation->set_rules('medicine_category_id', $this->lang->line('medicine_category_id'), 'required');
         $this->form_validation->set_rules('medicine_company', $this->lang->line('medicine_company'), 'required');
         $this->form_validation->set_rules('medicine_composition', $this->lang->line('medicine_composition'), 'required');
         $this->form_validation->set_rules('medicine_group', $this->lang->line('medicine_group'), 'required');
@@ -775,7 +773,7 @@ class Pharmacy extends Admin_Controller
         if ($this->form_validation->run() == false) {
             $msg = array(
                 'medicine_name'        => form_error('medicine_name'),
-                // 'medicine_category_id' => form_error('medicine_category_id'),
+                'medicine_category_id' => form_error('medicine_category_id'),
                 'medicine_company'     => form_error('medicine_company'),
                 'medicine_composition' => form_error('medicine_composition'),
                 'medicine_group'       => form_error('medicine_group'),
@@ -789,8 +787,7 @@ class Pharmacy extends Admin_Controller
             $pharmacy = array(
                 'id'                   => $id,
                 'medicine_name'        => $this->input->post('medicine_name'),
-                'medicine_category_id' => 1,
-                // 'medicine_category_id' => $this->input->post('medicine_category_id'),
+                'medicine_category_id' => $this->input->post('medicine_category_id'),
                 'medicine_company'     => $this->input->post('medicine_company'),
                 'medicine_composition' => $this->input->post('medicine_composition'),
                 'medicine_group'       => $this->input->post('medicine_group'),

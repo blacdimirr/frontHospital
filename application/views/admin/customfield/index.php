@@ -116,11 +116,6 @@
                                     <label class="checkbox-inline">
                                         <input type="checkbox" class="content_available" name="display_patient" value="1" <?php echo set_checkbox('display_patient', '1', (set_value('display_patient_panel') == 1) ? true : false); ?>>
                                         <?php echo $this->lang->line('on_patient_panel'); ?>
-                                    </label>
-
-                                    <label class="checkbox-inline">
-                                        <input type="checkbox" class="content_available" name="display_is_custom" value="1" <?php echo set_checkbox('display_is_custom', '1', (set_value('display_is_custom') == 1) ? true : false); ?>>
-                                        <?php echo $this->lang->line('display_is_custom'); ?>
                                     </label>                                   
                                 </div>
                             </div>                     

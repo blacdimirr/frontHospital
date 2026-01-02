@@ -1,11 +1,5 @@
 <?php $currency_symbol = $this->customlib->getHospitalCurrencyFormat();?>
 <div class="content-wrapper">
-    <style>
-        .background-custom {
-            text-align: center;
-            border-radius: 30px;
-        }
-    </style>
     <section class="content">
         <div class="row">
             <div class="col-md-12">
@@ -47,7 +41,6 @@
                                          ?>
                                         <th class="text-right"><?php echo $this->lang->line('amount') . " (" . $currency_symbol . ")"; ?>
                                         </th>
-                                        <th ><?php echo $this->lang->line('income_payments') . " (" . $currency_symbol . ")"; ?></th>
 
                                     </tr>
                                 </thead>
@@ -147,32 +140,7 @@
                                     </div>
                                 </div>
                                 <div class="">
-                                    <?php // echo display_custom_fields('income'); ?>
-                                </div>
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <label for="exampleInputEmail1"><?php echo $this->lang->line('evidence'); ?></label>
-                                        <input id="documents_other" name="documents_other" placeholder="" type="file" class="filestyle form-control" value="<?php echo set_value('documents_other'); ?>" />
-                                    </div>
-                                </div>
-                                <!-- gastos -->
-                                <div class="col-sm-6" style="display:none">
-                                    <div class="form-group">
-                                        <label for="exampleInputEmail1"><?php echo $this->lang->line('expenses'); ?> <small class="req"> *</small></label>
-                                        <select autofocus="" id="expense_id" name="expense_id" class="form-control" >
-                                            <option value=""><?php echo $this->lang->line('select'); ?></option>
-                                            <?php foreach ($expenselist as $expense) { ?>
-                                            <option value="<?php echo $expense['id'] ?>"
-                                                <?php
-                                                    if (set_value('expense_id') == $expense['id']) {
-                                                        echo "selected = selected";
-                                                    }
-                                                ?>>
-                                                <?php echo $expense['name'] ?>
-                                            </option>
-                                            <?php $count++; } ?>
-                                        </select>
-                                    </div>
+                                    <?php echo display_custom_fields('income'); ?>
                                 </div>
                             </div><!-- /.box-body -->
                     </div>
@@ -197,24 +165,6 @@
             <div class="modal-body pt0 pb0">
                 <div class="row">
                     <div class="col-lg-12 col-md-12 col-sm-12" id="edit_data">
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-</div>
-<div class="modal fade" id="myModalIncome_payment" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content modal-media-content">
-            <div class="modal-header modal-media-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title"><?php echo $this->lang->line('edit_income'); ?></h4>
-            </div>
-
-            <div class="modal-body pt0 pb0">
-                <div class="row">
-                    <div class="col-lg-12 col-md-12 col-sm-12" id="income_payment_data">
                     </div>
                 </div>
             </div>
@@ -310,19 +260,6 @@
         });
     }
 
-    function income_payment(id) {
-        $('#myModalIncome_payment').modal('show');
-        $.ajax({
-            url: '<?php echo base_url(); ?>admin/income/getDataByForIncomePayment/' + id,
-            success: function (data) {
-                $('#income_payment_data').html(data);
-            },
-            error: function () {
-                alert("Fail")
-            }
-        });
-    }
-
  $('#myModal').on('hidden.bs.modal', function () {
       $(".filestyle").next(".dropify-clear").trigger("click");
     $('form#add_income').find('input:text, input:password, input:file, textarea').val('');
@@ -331,141 +268,12 @@
 });
 
     $(document).ready(function (e) {
-        $('#myModal,#myModaledit,#myModalIncome_payment').modal({
+        $('#myModal,#myModaledit').modal({
         backdrop: 'static',
         keyboard: false,
         show:false
         });
     });
-    function initDatatable2(_selector, _url, params = {}, rm_export_btn = [], pageLength = 100, aoColumnDefs = [{
-        "bSortable": false,
-        "aTargets": [5],
-        'sClass': 'background-custom',
-    }], searching = true, aaSorting = [], dataSrc = "data") {
-
-        if ($.fn.DataTable.isDataTable('.' + _selector)) { // if exist datatable it will destrory first
-            $('.' + _selector).DataTable().destroy();
-        }
-        table = $('.' + _selector)
-            .on('preInit.dt', function(e, settings) {
-                var api = new $.fn.dataTable.Api(settings);
-                $.each(rm_export_btn, function(key, expt_select) {
-                   
-                    if (expt_select === "btn-all") {
-                        api.buttons().remove();
-
-                    } else {
-                        api.buttons('.' + expt_select).remove();
-
-                    }
-                });
-            }).DataTable({
-                // "scrollX": true,
-                dom: '<"top"f><Bl>r<t>ip',
-
-                lengthMenu: [
-                    [100, -1],
-                    [100, "All"]
-                ],
-
-                buttons: [{
-                        extend: 'copy',
-                        text: '<i class="fa fa-files-o"></i>',
-                        titleAttr: 'Copy',
-                        className: "btn-copy",
-                        title: $('.' + _selector).data("exportTitle"),
-                        exportOptions: {
-                            columns: ["thead th:not(.noExport)"]
-                        }
-                    },
-                    {
-                        extend: 'excel',
-                        text: '<i class="fa fa-file-excel-o"></i>',
-                        titleAttr: 'Excel',
-                        className: "btn-excel",
-                        title: $('.' + _selector).data("exportTitle"),
-                        exportOptions: {
-                            columns: ["thead th:not(.noExport)"]
-                        }
-                    },
-                    {
-                        extend: 'csv',
-                        text: '<i class="fa fa-file-text-o"></i>',
-                        titleAttr: 'CSV',
-                        className: "btn-csv",
-                        title: $('.' + _selector).data("exportTitle"),
-                        exportOptions: {
-                            columns: ["thead th:not(.noExport)"]
-                        }
-                    },
-                    {
-                        extend: 'pdf',
-                        text: '<i class="fa fa-file-pdf-o"></i>',
-                        titleAttr: 'PDF',
-                        className: "btn-pdf",
-                        title: $('.' + _selector).data("exportTitle"),
-                        exportOptions: {
-                            columns: ["thead th:not(.noExport)"]
-                        },
-
-                    },
-                    {
-                        extend: 'print',
-                        text: '<i class="fa fa-print"></i>',
-                        titleAttr: 'Print',
-                        className: "btn-print",
-                        title: $('.' + _selector).data("exportTitle"),
-                        customize: function(win) {
-
-                            $(win.document.body).find('th').addClass('display').css('text-align', 'center');
-                            $(win.document.body).find('table').addClass('display').css('font-size', '14px');
-                            $(win.document.body).find('td').addClass('display').css('text-align', 'left');
-                            $(win.document.body).find('h1').css('text-align', 'center');
-                        },
-                        exportOptions: {
-                            columns: ["thead th:not(.noExport)"]
-
-                        }
-
-                    }
-                ],
-
-                // "scrollY":        "320px",
-
-                "language": {
-                    processing: '<i class="fa fa-spinner fa-spin fa-1x fa-fw"></i><span class="sr-only">Loading...</span> ',
-                    sLengthMenu: "_MENU_"
-                },
-                "pageLength": pageLength,
-                "searching": searching,
-                "aaSorting": aaSorting, // default sorting [ [0,'asc'], [1,'asc'] ]
-                "aoColumnDefs": aoColumnDefs, //disable sorting { "bSortable": false, "aTargets": [ 1,2 ] }
-                "processing": true,
-                "serverSide": true,
-
-                "ajax": {
-                    "url": baseurl + _url,
-                    "dataSrc": dataSrc,
-                    "type": "POST",
-                    'data': params,
-                }
-
-            });
-
-        table.on('draw', function() {
-            table.column(5).nodes().to$().each(function(index, td) {
-                var data = $(td).text();
-                // .BLANCO {
-                //     background: rgb(155, 180, 216);
-                // }
-                if (data == 'CUENTA POR COBRAR') { $(td).css('background-color', '#eaee6a'); }
-                if (data == 'PAGADO PARCIALMENTE') { $(td).css('background-color', '#f0bf62'); }
-                // if (data == 'ENVIADO') { $(td).css('background-color', '#aff062'); }
-                if (data == 'PAGADO COMPLETO') { $(td).css('background-color', '#62f0f0'); }
-                if (data == '') { $(td).css('background-color', 'rgb(217, 225, 235)'); }
-            });
-        });
-    }
 </script>
 
 <!-- //========datatable start===== -->
@@ -473,7 +281,7 @@
 ( function ( $ ) {
     'use strict';
     $(document).ready(function () {
-        initDatatable2('ajaxlist','admin/income/getDatatable',[],[],100);
+        initDatatable('ajaxlist','admin/income/getDatatable',[],[],100);
     });
 } ( jQuery ) )
 </script>

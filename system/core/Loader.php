@@ -6,7 +6,7 @@
  *
  * This content is released under the MIT License (MIT)
  *
- * Copyright (c) 2019 - 2022, CodeIgniter Foundation
+ * Copyright (c) 2014 - 2017, British Columbia Institute of Technology
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,9 +29,8 @@
  * @package	CodeIgniter
  * @author	EllisLab Dev Team
  * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (https://ellislab.com/)
- * @copyright	Copyright (c) 2014 - 2019, British Columbia Institute of Technology (https://bcit.ca/)
- * @copyright	Copyright (c) 2019 - 2022, CodeIgniter Foundation (https://codeigniter.com/)
- * @license	https://opensource.org/licenses/MIT	MIT License
+ * @copyright	Copyright (c) 2014 - 2017, British Columbia Institute of Technology (http://bcit.ca/)
+ * @license	http://opensource.org/licenses/MIT	MIT License
  * @link	https://codeigniter.com
  * @since	Version 1.0.0
  * @filesource
@@ -47,7 +46,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @subpackage	Libraries
  * @category	Loader
  * @author		EllisLab Dev Team
- * @link		https://codeigniter.com/userguide3/libraries/loader.html
+ * @link		https://codeigniter.com/user_guide/libraries/loader.html
  */
 class CI_Loader {
 
@@ -227,7 +226,7 @@ class CI_Loader {
 	 *
 	 * Loads and instantiates models.
 	 *
-	 * @param	mixed	$model		Model name
+	 * @param	string	$model		Model name
 	 * @param	string	$name		An optional object name to assign to
 	 * @param	bool	$db_conn	An optional database connection configuration to initialize
 	 * @return	object
@@ -304,8 +303,6 @@ class CI_Loader {
 				{
 					throw new RuntimeException($app_path."Model.php exists, but doesn't declare class CI_Model");
 				}
-
-				log_message('info', 'CI_Model class loaded');
 			}
 			elseif ( ! class_exists('CI_Model', FALSE))
 			{
@@ -320,8 +317,6 @@ class CI_Loader {
 				{
 					throw new RuntimeException($app_path.$class.".php exists, but doesn't declare class ".$class);
 				}
-
-				log_message('info', config_item('subclass_prefix').'Model class loaded');
 			}
 		}
 
@@ -355,9 +350,7 @@ class CI_Loader {
 		}
 
 		$this->_ci_models[] = $name;
-		$model = new $model();
-		$CI->$name = $model;
-		log_message('info', 'Model "'.get_class($model).'" initialized');
+		$CI->$name = new $model();
 		return $this;
 	}
 

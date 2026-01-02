@@ -188,8 +188,7 @@ $currency_symbol = $this->customlib->getHospitalCurrencyFormat();
                                         <th><?php echo $this->lang->line('guardian_name'); ?></th>
                                         <th><?php echo $this->lang->line('doctor_name'); ?></th>
                                         <th ><?php echo $this->lang->line('symptoms'); ?></th>
-                                        <th ><?php echo $this->lang->line('findings'); ?></th>
-                                        <th ><?php echo $this->lang->line('Treatment'); ?></th>
+                                         <th ><?php echo $this->lang->line('findings'); ?></th>
                                        
                                          <?php 
                                             if (!empty($fields)) {
@@ -217,118 +216,8 @@ $currency_symbol = $this->customlib->getHospitalCurrencyFormat();
 
 
 <script type="text/javascript">
-    function initDatatable2(_selector, _url, params = {}, rm_export_btn = [], pageLength = 100, aoColumnDefs = [{
-        "bSortable": false,
-        "aTargets": [10],
-        'sClass': 'background-custom',
-    }], searching = true, aaSorting = [], dataSrc = "data") {
-        if ($.fn.DataTable.isDataTable('.' + _selector)) { // if exist datatable it will destrory first
-            $('.' + _selector).DataTable().destroy();
-        }
-        table = $('.' + _selector)
-            .on('preInit.dt', function(e, settings) {
-                var api = new $.fn.dataTable.Api(settings);
-                $.each(rm_export_btn, function(key, expt_select) {
-                   
-                    if (expt_select === "btn-all") {
-                        api.buttons().remove();
-
-                    } else {
-                        api.buttons('.' + expt_select).remove();
-
-                    }
-                });
-            }).DataTable({
-                // "scrollX": true,
-                dom: '<"top"f><Bl>r<t>ip',
-                lengthMenu: [
-                    [100, -1],
-                    [100, "All"]
-                ],
-                buttons: [{
-                        extend: 'copy',
-                        text: '<i class="fa fa-files-o"></i>',
-                        titleAttr: 'Copy',
-                        className: "btn-copy",
-                        title: $('.' + _selector).data("exportTitle"),
-                        exportOptions: {
-                            columns: ["thead th:not(.noExport)"]
-                        }
-                    },
-                    {
-                        extend: 'excel',
-                        text: '<i class="fa fa-file-excel-o"></i>',
-                        titleAttr: 'Excel',
-                        className: "btn-excel",
-                        title: $('.' + _selector).data("exportTitle"),
-                        exportOptions: {
-                            columns: ["thead th:not(.noExport)"]
-                        }
-                    },
-                    {
-                        extend: 'csv',
-                        text: '<i class="fa fa-file-text-o"></i>',
-                        titleAttr: 'CSV',
-                        className: "btn-csv",
-                        title: $('.' + _selector).data("exportTitle"),
-                        exportOptions: {
-                            columns: ["thead th:not(.noExport)"]
-                        }
-                    },
-                    {
-                        extend: 'pdf',
-                        text: '<i class="fa fa-file-pdf-o"></i>',
-                        titleAttr: 'PDF',
-                        className: "btn-pdf",
-                        title: $('.' + _selector).data("exportTitle"),
-                        exportOptions: {
-                            columns: ["thead th:not(.noExport)"]
-                        },
-
-                    },
-                    {
-                        extend: 'print',
-                        text: '<i class="fa fa-print"></i>',
-                        titleAttr: 'Print',
-                        className: "btn-print",
-                        title: $('.' + _selector).data("exportTitle"),
-                        customize: function(win) {
-
-                            $(win.document.body).find('th').addClass('display').css('text-align', 'center');
-                            $(win.document.body).find('table').addClass('display').css('font-size', '14px');
-                            $(win.document.body).find('td').addClass('display').css('text-align', 'left');
-                            $(win.document.body).find('h1').css('text-align', 'center');
-                        },
-                        exportOptions: {
-                            columns: ["thead th:not(.noExport)"]
-
-                        }
-
-                    }
-                ],
-                // "scrollY":        "320px",
-                "language": {
-                    processing: '<i class="fa fa-spinner fa-spin fa-1x fa-fw"></i><span class="sr-only">Loading...</span> ',
-                    sLengthMenu: "_MENU_"
-                },
-                "pageLength": pageLength,
-                "searching": searching,
-                "aaSorting": aaSorting, // default sorting [ [0,'asc'], [1,'asc'] ]
-                "aoColumnDefs": aoColumnDefs, //disable sorting { "bSortable": false, "aTargets": [ 1,2 ] }
-                "processing": true,
-                "serverSide": true,
-                "ajax": {
-                    "url": baseurl + _url,
-                    "dataSrc": dataSrc,
-                    "type": "POST",
-                    'data': params,
-                }
-            });
-    }
-
     $(document).ready(function (e) {
         emptyDatatable('allajaxlist', 'data');
-        // initDatatable2('allajaxlist','data');
     });
 
     function showdate(value) {
@@ -377,7 +266,7 @@ $currency_symbol = $this->customlib->getHospitalCurrencyFormat();
             cache: false,
             processData: false,
                beforeSend: function() {
-                 $('span[id^=error_]').html('');
+     $('span[id^=error_]').html('');
                },
             success: function (data) {
                // console.log(data.param)
@@ -391,7 +280,6 @@ $currency_symbol = $this->customlib->getHospitalCurrencyFormat();
                        {  "sWidth": "100px", "aTargets": [ 4 ] ,'sClass': 'dt-body-left'},
                        {  "sWidth": "80px", "aTargets": [ 5 ] ,'sClass': 'dt-body-left'},
                        {  "sWidth": "80px", "aTargets": [ -1 ] ,'sClass': 'dt-body-right'},
-                       {  "bSortable": false,"aTargets": [10],'sClass': 'background-custom'}
                     ]);
                 }
             },

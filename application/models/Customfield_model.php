@@ -190,9 +190,8 @@ class customfield_model extends MY_Model
         }
     }
 
-    public function get_custom_fields($belongs_to, $display_table = null, $display_print = null, $display_report = null, $display_patient_panel = null,$visible_is_custom = null)
+    public function get_custom_fields($belongs_to, $display_table = null, $display_print = null, $display_report = null, $display_patient_panel = null)
     {
-       
         $this->db->from('custom_fields');
         $this->db->where('belong_to', $belongs_to);
 
@@ -209,9 +208,6 @@ class customfield_model extends MY_Model
         }
         if ($display_patient_panel !=null) {
             $this->db->where('visible_on_patient_panel', $display_patient_panel);
-        }
-        if ($visible_is_custom !=null) {
-            $this->db->where('visible_is_custom', $visible_is_custom);
         }
        
         $query  = $this->db->get();

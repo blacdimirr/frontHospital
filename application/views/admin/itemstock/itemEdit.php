@@ -4,14 +4,14 @@
     <!-- Main content -->
     <section class="content">
         <div class="row">
-            <?php if ($this->rbac->hasPrivilege('item_stock', 'can_add') || $this->rbac->hasPrivilege('item_stock', 'can_edit')) { ?>
+            <?php if ($this->rbac->hasPrivilege('item_stock', 'can_add') || $this->rbac->hasPrivilege('item_stock', 'can_edit')) { ?> 
                 <div class="col-md-4">
                     <!-- Horizontal Form -->
                     <div class="box box-primary">
                         <div class="box-header with-border">
                             <h3 class="box-title"><?php echo $this->lang->line('add_item_stock'); ?></h3>
                         </div><!-- /.box-header -->
-                        <form id="form1" action="<?php echo base_url() ?>admin/itemstock/edit/<?php echo $item['id'] ?>" id="itemstockform" name="itemstockform" method="post" accept-charset="utf-8" enctype="multipart/form-data">
+                        <form id="form1" action="<?php echo base_url() ?>admin/itemstock/edit/<?php echo $item['id'] ?>"  id="itemstockform" name="itemstockform" method="post" accept-charset="utf-8" enctype="multipart/form-data">
 
                             <div class="box-body">
                                 <?php if ($this->session->flashdata('msg')) { ?>
@@ -27,18 +27,18 @@
                                 <div class="form-group">
                                     <label for="exampleInputEmail1"><?php echo $this->lang->line('item_category'); ?></label><small class="req"> *</small>
 
-                                    <select autofocus="" id="item_category_id" name="item_category_id" class="form-control">
+                                    <select autofocus="" id="item_category_id" name="item_category_id" class="form-control" >
                                         <option value=""><?php echo $this->lang->line('select'); ?></option>
                                         <?php
                                         foreach ($itemcatlist as $item_category) {
-                                        ?>
-                                            <option value="<?php echo $item_category['id'] ?>" <?php
-                                                                                                if (set_value('item_category_id', $item['item_category_id']) == $item_category['id']) {
-                                                                                                    echo "selected = selected";
-                                                                                                }
-                                                                                                ?>><?php echo $item_category['item_category'] ?></option>
+                                            ?>
+                                            <option value="<?php echo $item_category['id'] ?>"<?php
+                                            if (set_value('item_category_id', $item['item_category_id']) == $item_category['id']) {
+                                                echo "selected = selected";
+                                            }
+                                            ?>><?php echo $item_category['item_category'] ?></option>
 
-                                        <?php
+                                            <?php
                                         }
                                         ?>
                                     </select>
@@ -47,7 +47,7 @@
                                 <div class="form-group">
                                     <label for="exampleInputEmail1"><?php echo $this->lang->line('item'); ?></label><small class="req"> *</small>
 
-                                    <select id="item_id" name="item_id" class="form-control">
+                                    <select  id="item_id" name="item_id" class="form-control" >
                                         <option value=""><?php echo $this->lang->line('select'); ?></option>
 
                                     </select>
@@ -56,18 +56,18 @@
                                 <div class="form-group">
                                     <label for="exampleInputEmail1"><?php echo $this->lang->line('supplier'); ?></label>
 
-                                    <select id="supplier_id" name="supplier_id" class="form-control">
+                                    <select  id="supplier_id" name="supplier_id" class="form-control" >
                                         <option value=""><?php echo $this->lang->line('select'); ?></option>
                                         <?php
                                         foreach ($itemsupplier as $itemsup) {
-                                        ?>
-                                            <option value="<?php echo $itemsup['id'] ?>" <?php
-                                                                                            if (set_value('supplier_id', $item['supplier_id']) == $itemsup['id']) {
-                                                                                                echo "selected = selected";
-                                                                                            }
-                                                                                            ?>><?php echo $itemsup['item_supplier'] ?></option>
+                                            ?>
+                                            <option value="<?php echo $itemsup['id'] ?>"<?php
+                                            if (set_value('supplier_id', $item['supplier_id']) == $itemsup['id']) {
+                                                echo "selected = selected";
+                                            }
+                                            ?>><?php echo $itemsup['item_supplier'] ?></option>
 
-                                        <?php
+                                            <?php
                                         }
                                         ?>
                                     </select>
@@ -76,18 +76,18 @@
                                 <div class="form-group">
                                     <label for="exampleInputEmail1"><?php echo $this->lang->line('store'); ?></label>
 
-                                    <select id="store_id" name="store_id" class="form-control">
+                                    <select  id="store_id" name="store_id" class="form-control" >
                                         <option value=""><?php echo $this->lang->line('select'); ?></option>
                                         <?php
                                         foreach ($itemstore as $itemstore) {
-                                        ?>
-                                            <option value="<?php echo $itemstore['id'] ?>" <?php
-                                                                                            if (set_value('store_id', $item['store_id']) == $itemstore['id']) {
-                                                                                                echo "selected = selected";
-                                                                                            }
-                                                                                            ?>><?php echo $itemstore['item_store'] ?></option>
+                                            ?>
+                                            <option value="<?php echo $itemstore['id'] ?>"<?php
+                                            if (set_value('store_id', $item['store_id']) == $itemstore['id']) {
+                                                echo "selected = selected";
+                                            }
+                                            ?>><?php echo $itemstore['item_store'] ?></option>
 
-                                        <?php
+                                            <?php
                                         }
                                         ?>
                                     </select>
@@ -103,54 +103,30 @@
                                                 <option value="-" <?php echo set_select('symbol', '-', ($item['symbol'] == "-") ? TRUE : FALSE); ?>>-</option>
                                             </select>
                                         </span>
-                                        <input id="quantity" name="quantity" placeholder="" type="text" class="form-control miplusinput" value="<?php echo set_value('quantity', preg_replace('/[\s\-+]/', '', $item['quantity'])); ?>" />
+                                        <input id="quantity" name="quantity" placeholder="" type="text" class="form-control miplusinput"  value="<?php echo set_value('quantity', preg_replace('/[\s\-+]/', '', $item['quantity'])); ?>" />
                                     </div>
 
                                     <span class="text-danger"><?php echo form_error('quantity'); ?></span>
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputEmail1"><?php echo $this->lang->line('date'); ?></label>
-                                    <input id="date" name="date" placeholder="" type="text" class="form-control date" value="<?php echo set_value('date', date($this->customlib->getHospitalDateFormat(), $this->customlib->dateyyyymmddTodateformat($item['date']))); ?>" readonly="readonly" />
+                                    <input id="date" name="date" placeholder="" type="text" class="form-control date"  value="<?php echo set_value('date', date($this->customlib->getHospitalDateFormat(), $this->customlib->dateyyyymmddTodateformat($item['date']))); ?>" readonly="readonly" />
                                     <span class="text-danger"><?php echo form_error('date'); ?></span>
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputEmail1"><?php echo $this->lang->line('date'); ?></label>
-                                    <input id="date" name="date" placeholder="" type="text" class="form-control date" value="<?php echo set_value('date', date($this->customlib->getHospitalDateFormat(), $this->customlib->dateyyyymmddTodateformat($item['date']))); ?>" readonly="readonly" />
+                                    <input id="date" name="date" placeholder="" type="text" class="form-control date"  value="<?php echo set_value('date', date($this->customlib->getHospitalDateFormat(), $this->customlib->dateyyyymmddTodateformat($item['date']))); ?>" readonly="readonly" />
                                     <span class="text-danger"><?php echo form_error('date'); ?></span>
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputEmail1"><?php echo $this->lang->line('attach_document'); ?></label>
-                                    <input id="item_photo" name="item_photo" placeholder="" type="file" class="filestyle form-control" value="<?php echo set_value('item_photo'); ?>" />
+                                    <input id="item_photo" name="item_photo" placeholder="" type="file" class="filestyle form-control"  value="<?php echo set_value('item_photo'); ?>" />
                                     <span class="text-danger"><?php echo form_error('item_photo'); ?></span>
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputEmail1"><?php echo $this->lang->line('description'); ?></label>
                                     <textarea class="form-control" id="description" name="description" placeholder="" rows="3" placeholder="Enter ..."><?php echo set_value('description', $item['description']); ?></textarea>
                                     <span class="text-danger"></span>
-                                </div>
-                                <!-- Gastos -->
-                                <div class="col-sm-6" >
-                                    <div class="form-group">
-                                        <label for="exampleInputEmail1"><?php echo $this->lang->line('expenses'); ?> <small class="req"> *</small></label>
-                                        <select autofocus="" id="expense_id" name="expense_id" class="form-control" >
-                                            <option value=""><?php echo $this->lang->line('select'); ?></option>
-                                            <?php foreach ($expenselist as $expense) { ?>
-                                            <option  class="<?php echo $expense['id'] ?>" value="<?php echo $expense['id'] ?>"<?php
-                                                if (intval($income['expense_id']) === intval($expense['id'])) {
-                                                    echo "selected";
-                                                }
-                                                ?>><?php echo $expense['name'] ?>
-                                                    
-                                            </option>
-                                            <?php $count++; } ?>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <label for="exampleInputEmail1"><?php echo $this->lang->line('evidence'); ?></label>
-                                        <input id="documents_other" name="documents_other" placeholder="" type="file" class="filestyle form-control" value="<?php echo set_value('documents_other'); ?>" />
-                                    </div>
                                 </div>
                             </div><!-- /.box-body -->
                             <div class="box-footer">
@@ -162,12 +138,12 @@
                 <!-- left column -->
             <?php } ?>
             <div class="col-md-<?php
-                                if ($this->rbac->hasPrivilege('item_stock', 'can_add') || $this->rbac->hasPrivilege('item_stock', 'can_edit')) {
-                                    echo "8";
-                                } else {
-                                    echo "12";
-                                }
-                                ?>">
+            if ($this->rbac->hasPrivilege('item_stock', 'can_add') || $this->rbac->hasPrivilege('item_stock', 'can_edit')) {
+                echo "8";
+            } else {
+                echo "12";
+            }
+            ?>">
                 <!-- general form elements -->
                 <div class="box box-primary">
                     <div class="box-header ptbnull">
@@ -193,12 +169,12 @@
                                 <tbody>
                                     <?php
                                     if (empty($itemlist)) {
-                                    ?>
+                                        ?>
 
                                         <?php
                                     } else {
                                         foreach ($itemlist as $items) {
-                                        ?>
+                                            ?>
                                             <tr>
                                                 <td class="mailbox-name">
                                                     <a href="#" data-toggle="popover" class="detail_popover"><?php echo $items['name'] ?></a>
@@ -206,13 +182,13 @@
                                                     <div class="fee_detail_popover" style="display: none">
                                                         <?php
                                                         if ($items['description'] == "") {
-                                                        ?>
+                                                            ?>
                                                             <p class="text text-danger"><?php echo $this->lang->line('no_description'); ?></p>
-                                                        <?php
+                                                            <?php
                                                         } else {
-                                                        ?>
+                                                            ?>
                                                             <p class="text text-info"><?php echo $items['description']; ?></p>
-                                                        <?php
+                                                            <?php
                                                         }
                                                         ?>
                                                     </div>
@@ -234,21 +210,21 @@
                                                 </td>
                                                 <td class="mailbox-date pull-right"">
                                                     <?php if ($items['attachment']) {
+                                                        ?>
+                                                        <a href="<?php echo base_url(); ?>admin/itemstock/download/<?php echo $items['attachment'] ?>" class="btn btn-default btn-xs"  data-toggle="tooltip" title="<?php echo $this->lang->line('download'); ?>">
+                                                            <i class="fa fa-download"></i>
+                                                        </a>
+                                                    <?php }
                                                     ?>
-                                                        <a href=" <?php echo base_url(); ?>admin/itemstock/download/<?php echo $items['attachment'] ?>" class="btn btn-default btn-xs" data-toggle="tooltip" title="<?php echo $this->lang->line('download'); ?>">
-                                                    <i class="fa fa-download"></i>
+                                                    <a href="<?php echo base_url(); ?>admin/itemstock/edit/<?php echo $items['id'] ?>" class="btn btn-default btn-xs"  data-toggle="tooltip" title="<?php echo $this->lang->line('edit'); ?>">
+                                                        <i class="fa fa-pencil"></i>
                                                     </a>
-                                                <?php }
-                                                ?>
-                                                <a href="<?php echo base_url(); ?>admin/itemstock/edit/<?php echo $items['id'] ?>" class="btn btn-default btn-xs" data-toggle="tooltip" title="<?php echo $this->lang->line('edit'); ?>">
-                                                    <i class="fa fa-pencil"></i>
-                                                </a>
-                                                <a href="<?php echo base_url(); ?>admin/itemstock/delete/<?php echo $items['id'] ?>" class="btn btn-default btn-xs" data-toggle="tooltip" title="<?php echo $this->lang->line('delete'); ?>" onclick="return confirm('<?php echo $this->lang->line('delete_confirm') ?>');">
-                                                    <i class="fa fa-remove"></i>
-                                                </a>
+                                                    <a href="<?php echo base_url(); ?>admin/itemstock/delete/<?php echo $items['id'] ?>" class="btn btn-default btn-xs"  data-toggle="tooltip" title="<?php echo $this->lang->line('delete'); ?>" onclick="return confirm('<?php echo $this->lang->line('delete_confirm') ?>');">
+                                                        <i class="fa fa-remove"></i>
+                                                    </a>
                                                 </td>
                                             </tr>
-                                    <?php
+                                            <?php
                                         }
                                     }
                                     ?>
@@ -261,12 +237,12 @@
             </div><!--/.col (left) -->
             <!-- right column -->
         </div>
-
+        
     </section><!-- /.content -->
 </div><!-- /.content-wrapper -->
 
 <script type="text/javascript">
-    $(document).ready(function() {
+    $(document).ready(function () {
 
         var item_id_post = '<?php echo $item['item_id']; ?>';
         item_id_post = (item_id_post != "") ? item_id_post : 0;
@@ -283,12 +259,11 @@
                 $.ajax({
                     type: "GET",
                     url: base_url + "admin/itemstock/getItemByCategory",
-                    data: {
-                        'item_category_id': item_category_id_post
-                    },
+                    data: {'item_category_id': item_category_id_post},
                     dataType: "json",
-                    success: function(data) {
-                        $.each(data, function(i, obj) {
+                    success: function (data) {
+                        $.each(data, function (i, obj)
+                        {
                             var select = "";
                             if (item_id_post == obj.id) {
                                 var select = "selected=selected";
@@ -310,7 +285,7 @@
             autoclose: true
         });
 
-        $("#btnreset").click(function() {
+        $("#btnreset").click(function () {
             $("#form1")[0].reset();
         });
 
@@ -320,12 +295,12 @@
             trigger: 'hover',
             container: 'body',
             html: true,
-            content: function() {
+            content: function () {
                 return $(this).closest('td').find('.fee_detail_popover').html();
             }
         });
 
-        $(document).on('change', '#item_category_id', function(e) {
+        $(document).on('change', '#item_category_id', function (e) {
             $('#item_id').html("");
             var item_category_id = $(this).val();
             populateItem(0, item_category_id);

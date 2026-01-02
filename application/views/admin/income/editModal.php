@@ -78,30 +78,6 @@
             </div>
         </div><!-- /.box-body -->
         <div class=""><?php echo display_custom_fields('income',$income['id']);?></div>
-        <!-- Gastos -->
-        <div class="col-sm-6" style="display:none">
-            <div class="form-group">
-                <label for="exampleInputEmail1"><?php echo $this->lang->line('expenses'); ?> <small class="req"> *</small></label>
-                <select autofocus="" id="expense_id" name="expense_id" class="form-control" >
-                    <option value=""><?php echo $this->lang->line('select'); ?></option>
-                    <?php foreach ($expenselist as $expense) { ?>
-                    <option  class="<?php echo $expense['id'] ?>" value="<?php echo $expense['id'] ?>"<?php
-                        if (intval($income['expense_id']) === intval($expense['id'])) {
-                            echo "selected";
-                        }
-                        ?>><?php echo $expense['name'] ?>
-                            
-                    </option>
-                    <?php $count++; } ?>
-                </select>
-            </div>
-        </div>
-        <div class="col-sm-6">
-            <div class="form-group">
-                <label for="exampleInputEmail1"><?php echo $this->lang->line('evidence'); ?></label>
-                <input id="documents_other" name="documents_other" placeholder="" type="file" class="filestyle form-control" value="<?php echo set_value('documents_other'); ?>" />
-            </div>
-        </div>
 
     </div>
     <div class="row">

@@ -128,7 +128,7 @@ class Itemstock_model extends MY_Model
 
     public function getAllitemreportRecord() 
     {   
-        $sql="SELECT `item`.`quantity` as quantity_item, sum(`item_stock`.`quantity`) as available_stock, `item`.`name`, `item`.`item_category_id`, `item`.`description` as `des`, `item_category`.`item_category`, `item_supplier`.`item_supplier`, `item_store`.`item_store`,IFNULL((SELECT sum(quantity) from item_issue where item.id=item_issue.item_id),0) as total_issued FROM `item_stock` JOIN `item` ON `item`.`id` = `item_stock`.`item_id` JOIN `item_category` ON `item`.`item_category_id` = `item_category`.`id` JOIN `item_supplier` ON `item_stock`.`supplier_id` = `item_supplier`.`id` LEFT OUTER JOIN `item_store` ON `item_store`.`id` = `item_stock`.`store_id`"; 
+        $sql="SELECT sum(`item_stock`.`quantity`) as available_stock, `item`.`name`, `item`.`item_category_id`, `item`.`description` as `des`, `item_category`.`item_category`, `item_supplier`.`item_supplier`, `item_store`.`item_store`,IFNULL((SELECT sum(quantity) from item_issue where item.id=item_issue.item_id),0) as total_issued FROM `item_stock` JOIN `item` ON `item`.`id` = `item_stock`.`item_id` JOIN `item_category` ON `item`.`item_category_id` = `item_category`.`id` JOIN `item_supplier` ON `item_stock`.`supplier_id` = `item_supplier`.`id` LEFT OUTER JOIN `item_store` ON `item_store`.`id` = `item_stock`.`store_id`"; 
             $this->datatables->query($sql)
               ->searchable('item_stock.id,item.name,item_category.item_category,item_supplier.item_supplier,item_store.item_store')
               ->orderable('`item`.`name`,`item_category`.`item_category`, `item_supplier`.`item_supplier`,`item_store`.`item_store`,available_stock,null,null')

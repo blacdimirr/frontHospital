@@ -27,20 +27,18 @@ class Itemissue_model extends MY_Model
     public function getAllissueitemRecord()
     {
         $this->datatables
-            ->select('item_issue.*,item_store.item_store as item_store_name, item.name as `item_name`,item.item_category_id,item_category.item_category ,staff.employee_id,staff.name as docname,staff.surname as docsurname,roles.name')
+            ->select('item_issue.*,item.name as `item_name`,item.item_category_id,item_category.item_category ,staff.employee_id,staff.name as docname,staff.surname as docsurname,roles.name')
             ->join('item', 'item.id=item_issue.item_id', "LEFT")
-            ->join('item_store', 'item_store.id=item_issue.item_store_id', "left")
             ->join('item_category', 'item_category.id=item.item_category_id', "left")
             ->join('staff', 'staff.id=item_issue.issue_to', "left")
             ->join('staff_roles', 'staff_roles.staff_id =staff.id', "left")
             ->join('roles', 'roles.id= staff_roles.role_id', "left")
             ->searchable('item.name,item_category.item_category,item_issue.issue_date,staff.surname,roles.name,item_issue.quantity')
             ->orderable('item.name,item_category.item_category,item_issue.issue_date,staff.surname,roles.name,item_issue.quantity,item_issue.is_returned')
-            // ->sort('item_issue.issue_date', 'desc')
-            ->sort('item_issue.id', 'desc')
+            ->sort('item_issue.issue_date', 'desc')
             ->from('item_issue');
         return $this->datatables->generate('json');
-    }
+    } 
 
     public function remove($id)
     {
@@ -72,7 +70,7 @@ class Itemissue_model extends MY_Model
      * @param $data
      */
     public function add($data)
-    {
+    {   
         $this->db->trans_start(); # Starting Transaction
         $this->db->trans_strict(false); # See Note 01. If you wish can remove as well
         //=======================Code Start===========================
@@ -112,78 +110,7 @@ class Itemissue_model extends MY_Model
             }
             return $insert_id;
         }
-    }
 
-    public function add_details($data)
-    {
-        $this->db->trans_start(); # Starting Transaction
-        $this->db->trans_strict(false); # See Note 01. If you wish can remove as well
-        //=======================Code Start===========================
-        if (isset($data['id']) && $data['id'] != '') {
-
-            $this->db->where('item_issue_id', $data[0]['item_issue_id'])
-                ->delete('item_issue_details');
-            // $this->db->where('id', $data['id']);
-            // $this->db->update('item_issue_details', $data);
-            // $message = UPDATE_RECORD_CONSTANT . " For Item Issue id " . $data['id'];
-            // $action = "Update";
-            // $record_id = $data['id'];
-            // $this->log($message, $record_id, $action);
-            // //======================Code End==============================
-            // $this->db->trans_complete(); # Completing transaction
-            // /* Optional */
-            // if ($this->db->trans_status() === false) {
-            //     # Something went wrong.
-            //     $this->db->trans_rollback();
-            //     return false;
-            // } else {
-            //     return $record_id;
-            // }
-        } else {
-            $this->db->insert('item_issue_details', $data);
-            $insert_id = $this->db->insert_id();
-            $message = INSERT_RECORD_CONSTANT . " On Item Issue id " . $insert_id;
-            $action = "Insert";
-            $record_id = $insert_id;
-            $this->log($message, $record_id, $action);
-            //======================Code End==============================
-            $this->db->trans_complete(); # Completing transaction
-            /* Optional */
-            if ($this->db->trans_status() === false) {
-                # Something went wrong.
-                $this->db->trans_rollback();
-                return false;
-            } else {
-                //return $return_value;
-            }
-            return $insert_id;
-        }
-    }
-
-    public function get_item_issue_details($item_issue_id)
-    {
-        $query = $this->db->where("item_issue_details.item_issue_id", $item_issue_id)->where("item_issue_details.is_returned", 0)
-            ->select('item_issue_details.*,
-            item_issue.note _note,
-            item_issue.id _id,
-            item_issue.issue_by,
-            item_issue.issue_to,
-            item_issue.issue_date,
-            item_store.item_store as item_store_name,
-            CONCAT(staff.name," ",staff.surname) as staff_name,
-            ( 
-            select sum(ifnull(b.quantity,0)) from item_issue_details b where b.item_issue_id = item_issue_details.item_issue_id and b.sku = item_issue_details.sku  and b.is_returned = 0
-            )  -
-            ( 
-            select COALESCE(SUM(c.quantity),0) from item_issue_details c where c.item_issue_id = item_issue_details.item_issue_id and c.sku = item_issue_details.sku and c.is_returned = 1
-            ) 
-            existencia
-        ')
-            ->join('item_issue', 'item_issue.id=item_issue_details.item_issue_id', "left")
-            ->join('item_store', 'item_store.id=item_issue_details.item_store_id', "left")
-            ->join('staff', 'staff.id=item_issue.issue_to', "left")
-            ->get("item_issue_details");
-        return $query->result_array();
     }
 
     public function get_IssueInventoryReport($search_type)
@@ -280,144 +207,16 @@ class Itemissue_model extends MY_Model
 
         return $query->result_array();
     }
-
-    public function issueinventoryreportRecord($start_date, $end_date)
-    {
-
-        $sql = "SELECT item_issue.*,item.name as `item_name`,item.item_category_id,item_category.item_category ,staff.employee_id,staff.name as dname ,staff.surname,roles.name FROM `item_issue` INNER JOIN item on item.id=item_issue.item_id INNER JOIN item_category on item_category.id=item.item_category_id INNER JOIN staff on staff.id=item_issue.issue_to INNER JOIN staff_roles on staff_roles.staff_id =staff.id INNER JOIN roles on roles.id= staff_roles.role_id where date_format(item_issue.issue_date,'%Y-%m-%d') >='" . $start_date . "'and date_format(item_issue.issue_date,'%Y-%m-%d') <= '" . $end_date . "'";
-        $this->datatables->query($sql)
-            ->searchable('item.name,item_category.item_category,issue_date,return_date,staff.name,issue_by')
-            ->orderable('item.name,item_category.item_category,issue_date,name,issue_by ')
-            ->sort('date_format(item_issue.issue_date, "%m/%e/%Y")', 'desc')
-            ->query_where_enable(TRUE);
+    public function issueinventoryreportRecord($start_date, $end_date) {
+   
+        $sql="SELECT item_issue.*,item.name as `item_name`,item.item_category_id,item_category.item_category ,staff.employee_id,staff.name as dname ,staff.surname,roles.name FROM `item_issue` INNER JOIN item on item.id=item_issue.item_id INNER JOIN item_category on item_category.id=item.item_category_id INNER JOIN staff on staff.id=item_issue.issue_to INNER JOIN staff_roles on staff_roles.staff_id =staff.id INNER JOIN roles on roles.id= staff_roles.role_id where date_format(item_issue.issue_date,'%Y-%m-%d') >='". $start_date."'and date_format(item_issue.issue_date,'%Y-%m-%d') <= '".$end_date."'"; 
+            $this->datatables->query($sql)
+              ->searchable('item.name,item_category.item_category,issue_date,return_date,staff.name,issue_by')
+              ->orderable('item.name,item_category.item_category,issue_date,name,issue_by ')
+              ->sort('date_format(item_issue.issue_date, "%m/%e/%Y")','desc')
+              ->query_where_enable(TRUE);
         return $this->datatables->generate('json');
     }
 
-    // ordenes de compra
-    public function add_ordenes_compra($data)
-    {
-        $this->db->trans_start(); # Starting Transaction
-        $this->db->trans_strict(false); # See Note 01. If you wish can remove as well
-        //=======================Code Start===========================
-        if (isset($data['id']) && $data['id'] != '') {
-            $this->db->where('id', $data['id']);
-            $this->db->update('ordenes_compras', $data);
-            $message = UPDATE_RECORD_CONSTANT . " For Item Issue id " . $data['id'];
-            $action = "Update";
-            $record_id = $data['id'];
-            $this->log($message, $record_id, $action);
-            //======================Code End==============================
-            $this->db->trans_complete(); # Completing transaction
-            /* Optional */
-            if ($this->db->trans_status() === false) {
-                # Something went wrong.
-                $this->db->trans_rollback();
-                return false;
-            } else {
-                return $record_id;
-            }
-        } else {
-            $this->db->insert('ordenes_compras', $data);
-            $insert_id = $this->db->insert_id();
-            $message = INSERT_RECORD_CONSTANT . " On Item Issue id " . $insert_id;
-            $action = "Insert";
-            $record_id = $insert_id;
-            $this->log($message, $record_id, $action);
-            //======================Code End==============================
-            $this->db->trans_complete(); # Completing transaction
-            /* Optional */
-            if ($this->db->trans_status() === false) {
-                # Something went wrong.
-                $this->db->trans_rollback();
-                return false;
-            } else {
-                //return $return_value;
-            }
-            return $insert_id;
-        }
-    }
-
-    public function add_ordenes_compra_detalle($data)
-    {
-        $this->db->trans_start(); # Starting Transaction
-        $this->db->trans_strict(false); # See Note 01. If you wish can remove as well
-        //=======================Code Start===========================
-        if (isset($data['id']) && $data['id'] != '') {
-
-            $this->db->where('orden_compra_id', $data[0]['orden_compra_id'])
-                ->delete('ordenes_compra_detalle');
-        } else {
-            $this->db->insert('ordenes_compra_detalle', $data);
-            $insert_id = $this->db->insert_id();
-            $message = INSERT_RECORD_CONSTANT . " On Item Issue id " . $insert_id;
-            $action = "Insert";
-            $record_id = $insert_id;
-            $this->log($message, $record_id, $action);
-            //======================Code End==============================
-            $this->db->trans_complete(); # Completing transaction
-            /* Optional */
-            if ($this->db->trans_status() === false) {
-                # Something went wrong.
-                $this->db->trans_rollback();
-                return false;
-            } else {
-                //return $return_value;
-            }
-            return $insert_id;
-        }
-    }
-
-    public function get_ordenes_compra()
-    {
-        $this->datatables
-            ->select('ordenes_compras.*,staff.employee_id, staff.name as staff_name,staff.surname as staff_surname')
-            ->join('staff', 'staff.id=ordenes_compras.generated_by', "left")
-            // ->join('item', 'item.id=item_issue.item_id', "LEFT")
-            // ->join('item_store', 'item_store.id=item_issue.item_store_id', "left")
-            // ->join('item_category', 'item_category.id=item.item_category_id', "left")
-            // ->join('staff_roles', 'staff_roles.staff_id =staff.id', "left")
-            // ->join('roles', 'roles.id= staff_roles.role_id', "left")
-            // ->searchable('ordenes_compras.name,item_category.item_category,item_issue.issue_date,staff.surname,roles.name,item_issue.quantity')
-            ->searchable('CONCAT(staff.name," ",staff.surname) as staff_name)')
-            ->orderable('ordenes_compras.created_at')
-            ->sort('ordenes_compras.created_at', 'desc')
-            ->where('ordenes_compras.is_deleted', 0)
-            ->from('ordenes_compras');
-        return $this->datatables->generate('json');
-    }
-
-     public function get_ordenes_compra_detalle($orden_compra_id)
-    {
-        $query = $this->db->where("ordenes_compra_detalle.orden_compra_id", $orden_compra_id)
-            ->select('ordenes_compra_detalle.*,ordenes_compras.id as _id,ordenes_compras.suplidores, ordenes_compras.orden_compra,ordenes_compras.note,ordenes_compras.received_date,staff.name as staff_name,staff.surname as staff_surname')
-            ->join('ordenes_compras', 'ordenes_compras.id=ordenes_compra_detalle.orden_compra_id', "left")
-            ->join('staff', 'staff.id=ordenes_compras.generated_by', "left")
-            ->get("ordenes_compra_detalle");
-        return $query->result_array();
-    }
-
-    public function remove_orden_compra($data)
-    {
-        $this->db->trans_start(); # Starting Transaction
-        $this->db->trans_strict(false); # See Note 01. If you wish can remove as well
-        //=======================Code Start===========================
-        $this->db->where('id', $data['id']);
-        $this->db->update('ordenes_compras',$data);
-        $message = DELETE_RECORD_CONSTANT . " Where Item Issue id " . $data['id'];
-        $action = "Delete";
-        $record_id = $data['id'];
-        $this->log($message, $record_id, $action);
-        //======================Code End==============================
-        $this->db->trans_complete(); # Completing transaction
-        /* Optional */
-        if ($this->db->trans_status() === false) {
-            # Something went wrong.
-            $this->db->trans_rollback();
-            return false;
-        } else {
-            //return $return_value;
-        }
-    }
-
-
+    
 }

@@ -241,7 +241,7 @@ class Report_model extends CI_Model
     //     return $res->result_array();
     // }
 
-    public function appointmentRecord($start_date, $end_date, $collect_staff = "", $shift = "", $appointment_priority = "", $appointment_type = "",$created_id = "",$nationality = "") {
+    public function appointmentRecord($start_date, $end_date, $collect_staff = "", $shift = "", $appointment_priority = "", $appointment_type = "") {
         
         $custom_fields             = $this->customfield_model->get_custom_fields('appointment','','',1);
         $custom_field_column_array = array();
@@ -273,15 +273,9 @@ class Report_model extends CI_Model
         if($appointment_type != ""){
             $condition .= " and appointment.source = '".$appointment_type."'";
         }
-        if($created_id != ""){ 
-            $condition .= " and appointment.created_id = ".$created_id;
-        }
-        if($nationality != ""){
-            $condition .= " and patients.nationality = '".$nationality."' ";
-        }
 
-        
-        $sql="select appointment.*,patients.mobileno,patients.email,patients.gender,appointment_payment.paid_amount,patients.patient_name,patients.id as `patient_id`,staff.name,staff.surname,staff.employee_id,patients.nationality ".$field_variable." from appointment  
+
+        $sql="select appointment.*,patients.mobileno,patients.email,patients.gender,appointment_payment.paid_amount,patients.patient_name,patients.id as `patient_id`,staff.name,staff.surname,staff.employee_id ".$field_variable." from appointment  
         join appointment_payment on appointment_payment.appointment_id = appointment.id
         JOIN patients on patients.id = appointment.patient_id LEFT JOIN staff on staff.id = appointment.doctor ".$custom_join." where date_format(appointment.date,'%Y-%m-%d') >='". $start_date."'and date_format(appointment.date,'%Y-%m-%d') <= '".$end_date."'".$condition ;
              $this->datatables->query($sql) 

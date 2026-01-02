@@ -163,7 +163,3 @@ function random_string($len = 5){
   $string = substr(str_shuffle(str_repeat("0123456789abcdefghijklmnopqrstuvwxyz", 5)), 0, $len);
   return $string;
 }
-
-function generarSecuencia($id) {
-    return str_pad($id, 6, '0', STR_PAD_LEFT);
-}

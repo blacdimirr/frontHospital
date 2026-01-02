@@ -96,34 +96,6 @@ $currency_symbol = $this->customlib->getHospitalCurrencyFormat();
                                                 <span class="text-danger"><?php echo form_error('date_to'); ?></span>
                                             </div>
                                         </div>
-                                        <!-- Add filter BEGIN -->
-                                        <div class="col-sm-6 col-md-3">
-                                            <div class="form-group">
-                                            <label><?php echo $this->lang->line("users"); ?></label>
-                                            <select class="form-control select2"  name="created_id" style="width: 100%" id="created_id">
-                                            <option value=""><?php echo $this->lang->line('select') ?></option>
-                                                <?php foreach ($userslist as $dkey => $value) { ?>
-                                                    <option value="<?php echo $value["id"] ?>"><?php echo $value["name"] . " " . $value["surname"] ." (". $value["employee_id"].")" ?></option>
-                                                <?php }?>
-                                            </select>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-sm-6 col-md-3">
-                                            <div class="form-group">
-                                                <label><?php echo $this->lang->line("nationality"); ?></label>
-                                                <select name="nationality" class="form-control">
-                                                    <!-- <option value="República Dominicana (la)">República Dominicana (la)</option> -->
-                                                    <option value=""><?php echo $this->lang->line('select') ?></option>
-                                                    <?php foreach ($nationality_array as $key => $value) {
-                                                        ?>
-                                                        <option value="<?php echo $value['iso_name']; ?>" > <?php echo $value['iso_name']; ?></option>
-                                                    <?php } ?>
-                                                </select>
-                                            </div> 
-                                        </div>
-                                        <!-- FILTER END -->
-
                                         <div class="form-group">
                                             <div class="col-sm-12">
                                                  <button type="submit" name="search" value="search_filter" class="btn btn-primary btn-sm pull-right"><i class="fa fa-search"></i> <?php echo $this->lang->line('search'); ?></button>
@@ -156,7 +128,6 @@ $currency_symbol = $this->customlib->getHospitalCurrencyFormat();
                                              }
                                             ?> 
                                              <th><?php echo $this->lang->line('fees'); ?></th>
-                                             <th><?php echo $this->lang->line('nationality'); ?></th>
                                             <th class="text text-right"><?php echo $this->lang->line('status'); ?></th>
                                         </tr>
                                     </thead>

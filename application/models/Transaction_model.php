@@ -396,16 +396,9 @@ class Transaction_model extends MY_Model
             $start_date = $data['start_date'] ;
             $end_date = $data['end_date'] ;
               $condition.= " and  date_format(appointment_date,'%Y-%m-%d') >='". $start_date."' and date_format(appointment_date,'%Y-%m-%d') <= '".$end_date."' " ;
-        } 
-        
-        if($data['created_id'] != ""){
-            $condition .= " and opd_details.generated_by = ".$data['created_id']; 
-        }
-        if($data['nationality'] != ""){
-            $condition .= " and patients.nationality = '".$data['nationality']."' ";
-        }
+        }      
        
-         $sql="select opd_details.id,'opd_no' module_no,visit_details.id as visit_id,visit_details.symptoms,visit_details.appointment_date, ipd_prescription_basic.finding_description, patients.patient_name,patients.dob,patients.age,patients.month,patients.day,patients.gender,patients.mobileno,patients.guardian_name,patients.address,patients.id patientid,staff.name,staff.surname,staff.employee_id,patients.nationality ".$field_variable." from opd_details 
+         $sql="select opd_details.id,'opd_no' module_no,visit_details.id as visit_id,visit_details.symptoms,visit_details.appointment_date, ipd_prescription_basic.finding_description, patients.patient_name,patients.dob,patients.age,patients.month,patients.day,patients.gender,patients.mobileno,patients.guardian_name,patients.address,patients.id patientid,staff.name,staff.surname,staff.employee_id ".$field_variable." from opd_details 
         left join visit_details on  opd_details.id=visit_details.opd_details_id 
         left join ipd_prescription_basic on ipd_prescription_basic.visit_details_id = visit_details.id  
         left join patients on patients.id = opd_details.patient_id

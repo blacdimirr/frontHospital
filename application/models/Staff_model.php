@@ -712,15 +712,6 @@ class Staff_model extends MY_Model
         return false;
     }
 
-    public function getNationalities()
-    {        
-        $this->db->select('id,name,iso_name,alfa2,alfa3,numerico');
-        $this->db->order_by("iso_name", 'asc');
-        $this->db->from('paises');
-        $query = $this->db->get();
-        return $query->result_array();
-    }
-    
     public function getStaffbyrole($id)
     {
         if ($this->session->has_userdata('hospitaladmin')) {

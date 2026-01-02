@@ -215,11 +215,10 @@ if ((isset($patient_select)) && ($patient_select == $dvalue["id"])) {
                            <?php if ($this->module_lib->hasActive('live_consultation')) { ?>
                             <div class="col-sm-4">
                                  <div class="form-group">
-                                 <input type="hidden" name="live_consult" id="live_consult" value="no" class="form-control">
-                                 <!-- <label><?php echo $this->lang->line('live') . " " . $this->lang->line('consultant') . " (" . $this->lang->line('on') . " " . $this->lang->line('video') . " " . $this->lang->line('conference') . ")"; ?></label> -->
-                                        <!-- <small class="req">*</small> -->
-                                         <!-- <div> -->
-                                             <!-- <select name="live_consult" id="live_consult" class="form-control">
+                                 <label><?php echo $this->lang->line('live') . " " . $this->lang->line('consultant') . " (" . $this->lang->line('on') . " " . $this->lang->line('video') . " " . $this->lang->line('conference') . ")"; ?></label>
+                                        <small class="req">*</small>
+                                         <div>
+                                             <select name="live_consult" id="live_consult" class="form-control">
                                                     <?php foreach ($yesno_condition as $yesno_key => $yesno_value) {
                                                         ?>
                                                         <option value="<?php echo $yesno_key ?>" <?php
@@ -229,8 +228,8 @@ if ((isset($patient_select)) && ($patient_select == $dvalue["id"])) {
                                                                 ?> ><?php echo $yesno_value ?>
                                                         </option>
                                                         <?php } ?>
-                                                </select> -->
-                                    <!-- </div><span class="text-danger"><?php echo form_error('live_consult'); ?></span> -->
+                                                </select>
+                                    </div><span class="text-danger"><?php echo form_error('live_consult'); ?></span>
                                 </div>
                             </div>
                           <?php } ?>
@@ -393,9 +392,8 @@ foreach ($genderList as $key => $value) {
                           <?php if ($this->module_lib->hasActive('live_consultation')) { ?>
                             <div class="col-sm-4">
                                 <div class="form-group">
-                                    <input type="hidden" name="live_consult" id="live_consult" value="no" class="form-control">
-                                    <!-- <label><?php echo $this->lang->line('live') . " " . $this->lang->line('consultant') . " (" . $this->lang->line('on') . " " . $this->lang->line('video') . " " . $this->lang->line('conference') . ")"; ?></label> -->
-                                      <!-- <select name="live_consult" id="edit_liveconsult" class="form-control">
+                                    <label><?php echo $this->lang->line('live') . " " . $this->lang->line('consultant') . " (" . $this->lang->line('on') . " " . $this->lang->line('video') . " " . $this->lang->line('conference') . ")"; ?></label>
+                                      <select name="live_consult" id="edit_liveconsult" class="form-control">
                                     <?php foreach ($yesno_condition as $yesno_key => $yesno_value) {
                                                         ?>
                                         <option value="<?php echo $yesno_key ?>" <?php 
@@ -405,7 +403,7 @@ foreach ($genderList as $key => $value) {
                                             
                                         </option>
                                     <?php } ?>
-                                </select>     -->
+                                </select>    
                                    
                                 </div>
                             </div>

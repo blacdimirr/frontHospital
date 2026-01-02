@@ -1,7 +1,6 @@
 <?php
 $genderList = $this->customlib->getGender_Patient();
 $marital_status = $this->config->item('marital_status');
-$nationality_array          = $this->staff_model->getNationalities();
 ?>
 <div class="modal fade" id="myModalpa" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog modal-lg" role="document">
@@ -58,7 +57,7 @@ $nationality_array          = $this->staff_model->getNationalities();
   
                                                 <div class="col-sm-5" id="calculate">
                                                     <div class="form-group">
-                                                        <label><?php echo $this->lang->line('age'); ?> </label><small class="req"> *</small> 
+                                                        <label><?php echo $this->lang->line('age').' ('.$this->lang->line('yy_mm_dd').')'; ?> </label><small class="req"> *</small> 
                                                         <div style="clear: both;overflow: hidden;">
                                                             <input type="text" placeholder="<?php echo $this->lang->line('year'); ?>" name="age[year]" id="age_year" value="" class="form-control patient_age_year" style="width: 30%; float: left;">
 
@@ -171,19 +170,7 @@ $nationality_array          = $this->staff_model->getNationalities();
                                                 <label><?php echo $this->lang->line("national_identification_number"); ?></label> 
                                                 <input name="identification_number" placeholder="" class="form-control" /><?php echo set_value('identification_number'); ?>
                                             </div> 
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <label><?php echo $this->lang->line("nationality"); ?></label>
-                                                <select name="nationality" class="form-control">
-                                                    <option value="República Dominicana (la)">República Dominicana (la)</option>
-                                                    <?php foreach ($nationality_array as $key => $value) {
-                                                        ?>
-                                                        <option value="<?php echo $value['iso_name']; ?>" <?php if (set_value('nationality') == $value['iso_name']) echo "selected"; ?>> <?php echo $value['iso_name']; ?></option>
-                                                    <?php } ?>
-                                                </select>
-                                            </div> 
-                                        </div>
+                                        </div> 
                                         <div class="">
                                             
                                             <?php

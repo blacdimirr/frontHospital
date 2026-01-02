@@ -417,8 +417,7 @@ class Charges extends Admin_Controller
             } else {
                 $charge_data = $this->input->post('pre_charge_id');
                 foreach ($charge_data as $key => $value) {
-                    $date              = empty($this->input->post('pre_date')[$key])?$this->input->post('date'):$this->input->post('pre_date');
-                    $note = empty($this->input->post('pre_note')[$key])? '':$this->input->post('pre_note')[$key];
+                    $date              = $this->input->post('pre_date')[$key];
                     $patient_charge_id = $this->input->post('patient_charge_id');
                     $insert_data       = array(
                         'date'            => $this->customlib->dateFormatToYYYYMMDDHis($date, $this->customlib->getHospitalTimeFormat()),
@@ -430,7 +429,7 @@ class Charges extends Admin_Controller
                         'standard_charge' => $this->input->post('pre_standard_charge')[$key],
                         'amount'          => $this->input->post('pre_net_amount')[$key],
                         'created_at'      => date('Y-m-d'),
-                        'note'            => $note,
+                        'note'            => $this->input->post('pre_note')[$key],
                         'tax'             => $this->input->post('pre_tax_percentage')[$key],
                     );
 
@@ -451,8 +450,8 @@ class Charges extends Admin_Controller
                         'charge_name'     => $preview_data->name,
                         'qty'             => $this->input->post('pre_qty')[$key],
                         'net_amount'      => $this->input->post('pre_net_amount')[$key],
-                        'edit_note'      =>  $note,
-                        'date'            => $this->customlib->YYYYMMDDHisTodateFormat($date, $this->customlib->getHospitalTimeFormat()), 
+                        'edit_note'      => $this->input->post('pre_note')[$key],                        
+                        'date'            => $this->customlib->YYYYMMDDHisTodateFormat($this->input->post('pre_date')[$key], $this->customlib->getHospitalTimeFormat()), 
                     );
 
                     $this->system_notification->send_system_notification('add_opd_patient_charge', $event_data);

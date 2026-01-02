@@ -36,7 +36,7 @@ $genderList      = $this->customlib->getGender_Patient();
                     <th><?php echo $this->lang->line('source'); ?></th>
                     <th><?php echo $this->lang->line('priority'); ?></th>
                     <?php if ($this->module_lib->hasActive('live_consultation')) { ?>
-                    <!-- <th><?php // echo $this->lang->line('live_consultant'); ?></th> -->
+                    <th><?php echo $this->lang->line('live_consultant'); ?></th>
                     
                     <?php } ?>
                     <?php 
@@ -48,7 +48,7 @@ $genderList      = $this->customlib->getGender_Patient();
                     } 
                     }
                     ?> 
-                     <!-- <th><?php echo $this->lang->line('fees'); ?></th> -->
+                     <th><?php echo $this->lang->line('fees'); ?></th>
                     <th width="150" class="text-right"><?php echo $this->lang->line('status'); ?></th>
                   </tr>
                 </thead>
@@ -94,56 +94,15 @@ $genderList      = $this->customlib->getGender_Patient();
           <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12">
               <div class="row">
-                <!-- <div class="col-sm-3">
-                  <div class="form-group">
-                    <label for="exampleInputFile"><?php echo $this->lang->line('specialist'); ?></label>
-                    <small class="req"> *</small>
-                    <div>
-                      <select class="form-control select2 specialist_select2" name="specialistid" onchange="getSpecialistShift(this);getSpecialistFees(this)" <?php
-                        if ((isset($disable_option)) && ($disable_option == true)) {
-                        echo 'disabled';
-                        }
-                        ?> name='specialist' id="specialistid" style="width:100%" >
-                        <option value="<?php echo set_value('specialist'); ?>"><?php echo $this->lang->line('select') ?></option>
-                        <?php foreach ($specialists as $dkey => $dvalue) {
-                        ?>
-                        <option value="<?php echo $dvalue["id"]; ?>" <?php
-                        if ($specialist_select == $dvalue['id']) {
-                        echo 'selected';
-                        }
-                        ?>><?php echo $dvalue["name"] . " " . $dvalue["surname"] ." (". $dvalue["employee_id"].")" ?></option>
-                        <?php }?>
-                      </select>
-                    </div>
-                    <span class="text-danger"><?php echo form_error('specialist'); ?></span>
-                  </div>
-                </div> -->
-
-                <div class="col-sm-3">
-                    <div class="form-group">
-                        <label for="exampleInputFile">
-                            <?php echo $this->lang->line('specialist'); ?></label><small class="req"> *</small>
-                        <div>
-                            <select class="form-control" name='specialist' id="specialist"  onchange="getdoctor(this.value)" >
-                                <option value="<?php echo set_value('specialist'); ?>"><?php echo $this->lang->line('select') ?></option>
-                                <?php foreach ($specialists as $skey => $specialist_value) {
-                                ?>
-                                    <option value="<?php echo $specialist_value['id']; ?>"><?php echo $specialist_value['specialist_name']; ?></option>
-                                <?php }?>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                
                 <div class="col-sm-3">
                   <div class="form-group">
                     <label for="exampleInputFile"><?php echo $this->lang->line('doctor'); ?></label>
                     <small class="req"> *</small>
                     <div>
                       <select class="form-control select2 doctor_select2" name="doctorid" onchange="getDoctorShift(this);getDoctorFees(this)" <?php
-                        // if ((isset($disable_option)) && ($disable_option == true)) {
-                        // echo 'disabled';
-                        // }
+                        if ((isset($disable_option)) && ($disable_option == true)) {
+                        echo 'disabled';
+                        }
                         ?> name='doctor' id="doctorid" style="width:100%" >
                         <option value="<?php echo set_value('doctor'); ?>"><?php echo $this->lang->line('select') ?></option>
                         <?php foreach ($doctors as $dkey => $dvalue) {
@@ -156,16 +115,11 @@ $genderList      = $this->customlib->getGender_Patient();
                         <?php }?>
                       </select>
                       <input type="hidden" name="charge_id" value="" id="charge_id" />
-                      <input type="hidden" value="0" name="amount" id="doctor_fees" class="form-control" readonly="readonly">
-                      <input type="hidden" name="global_shift" value="1" />
-                      <!-- <input type="hidden" name="slot" value="2" /> -->
-                      <input type="hidden" name="payment_mode" value="Other" />
                     </div>
                     <span class="text-danger"><?php echo form_error('doctor'); ?></span>
                   </div>
                 </div>
-                <!-- Ocultar campo Honorarios del médico -->
-                <!-- <div class="col-sm-3">
+                <div class="col-sm-3">
                   <div class="form-group">
                     <label for="doctor_fees"><?php echo $this->lang->line("doctor_fees"); ?></label>
                     <small class="req"> *</small>
@@ -174,11 +128,10 @@ $genderList      = $this->customlib->getGender_Patient();
                     </div>
                     <span class="text-danger"><?php echo form_error('doctor_fees'); ?></span>
                   </div>
-                </div> -->
-                 <!-- Ocultar campo Cambio -->
+                </div>
                 <div class="col-sm-3">
                     <div class="form-group">
-                        <label for="pwd"><?php echo $this->lang->line('shift'); ?></label>
+                        <label for="pwd"><?php echo $this->lang->line('shift'); ?></label><span class="req"> *</span>
                         <select name="global_shift" id="global_shift" class="select2" style="width:100%">
                             <option value=""><?php echo $this->lang->line('select'); ?></option>
                         </select>
@@ -215,8 +168,7 @@ $genderList      = $this->customlib->getGender_Patient();
                     <span class="text-danger"><?php echo form_error('doctor'); ?></span>
                   </div>
                 </div>
-                <!-- Ocultar metodo o modo de pago -->
-                <!-- <div class="col-sm-3">
+                <div class="col-sm-3">
                   <div class="form-group">
                       <label><?php echo $this->lang->line('payment_mode'); ?></label> 
                       <select class="form-control payment_mode" name="payment_mode">
@@ -226,7 +178,7 @@ $genderList      = $this->customlib->getGender_Patient();
                       </select>    
                       <span class="text-danger"><?php echo form_error('apply_charge'); ?></span>
                   </div>
-                </div> -->
+                </div>
                 <div class="col-sm-3">
                       <div class="form-group">
                         <label for="appointment_status"><?php echo $this->lang->line('status'); ?><small class="req"> *</small></label>
@@ -271,10 +223,9 @@ $genderList      = $this->customlib->getGender_Patient();
               <?php if ($this->module_lib->hasActive('live_consultation')) { ?>
               <div class="col-sm-4">
                 <div class="form-group">
-                <input type="hidden" name="live_consult" id="live_consult" value="no" class="form-control">
-                  <!-- <label for="exampleInputFile"><?php echo $this->lang->line('live_consultant_on_video_conference'); ?></label> -->
-                  <!-- <small class="req">*</small> -->
-                  <!-- <div>
+                  <label for="exampleInputFile"><?php echo $this->lang->line('live_consultant_on_video_conference'); ?></label>
+                  <small class="req">*</small>
+                  <div>
                   <select name="live_consult" id="live_consult" class="form-control">
                       <?php foreach ($yesno_condition as $yesno_key => $yesno_value) {
                           ?>
@@ -286,8 +237,8 @@ $genderList      = $this->customlib->getGender_Patient();
                           </option>
                           <?php } ?>
                   </select>
-                  </div> -->
-                  <!-- <span class="text-danger"><?php echo form_error('live_consult'); ?></span> -->
+                  </div>
+                  <span class="text-danger"><?php echo form_error('live_consult'); ?></span>
                 </div>
               </div>
               <?php } ?>
@@ -418,9 +369,8 @@ $genderList      = $this->customlib->getGender_Patient();
                         <?php if ($this->module_lib->hasActive('live_consultation')) { ?>
                   <div class="col-sm-4">
                     <div class="form-group">
-                      <input type="hidden" name="live_consult" id="live_consult" value="no" class="form-control">
-                      <!-- <label><?php echo $this->lang->line('live_consultant_on_video_conference'); ?></label> <small class="req">*</small> -->
-                      <!-- <select name="live_consult" id="edit_liveconsult" class="form-control">
+                      <label><?php echo $this->lang->line('live_consultant_on_video_conference'); ?></label> <small class="req">*</small>
+                      <select name="live_consult" id="edit_liveconsult" class="form-control">
                         <?php foreach ($yesno_condition as $yesno_key => $yesno_value) {
                             ?>
                             <option value="<?php echo $yesno_key ?>" <?php
@@ -430,7 +380,7 @@ $genderList      = $this->customlib->getGender_Patient();
                                     ?> ><?php echo $yesno_value ?>
                             </option>
                         <?php } ?>
-                      </select> -->
+                      </select>
                     </div>
                   </div>
                   <?php } ?>
@@ -976,7 +926,6 @@ function getRecord(id) {
     data: {appointment_id: id},
     dataType: 'json',
     success: function (data) {
-      console.log(458);
       $('#customfield').html(data.custom_fields_value);
       $("#id").val(data.id);
       $("#doctor").val(data.doctor).trigger("change");
@@ -1117,7 +1066,6 @@ function delete_record(id) {
   
   $('#myModal').on('hidden.bs.modal', function () {
     $(".appointment_priority_select2").select2("val", "");
-    // $(".specialist_select2").select2("val", "");
     $(".doctor_select2").select2("val", "");
     $("#addpatient_id").select2("val", "");
     $('#formadd').find('input:text, input:password, input:file, textarea').val('');
@@ -1328,33 +1276,6 @@ function delete_record(id) {
       }
       
     }
-
-    function getdoctor(id, doc = '') {
-       
-       var div_data = "";
-       $('#doctorid').html("<option value='l'><?php echo $this->lang->line('loading') ?></option>");
-
-       $.ajax({
-          //  url: '<?php echo base_url(); ?>patient/dashboard/getdoctor',
-          url: baseurl+'admin/onlineappointment/getdoctor',
-           type: "POST",
-           data: {id: id, active: 'yes'},
-           dataType: 'json',
-           success: function (res) {
-               $.each(res, function (i, obj)
-               {
-                // console.log('res',obj );
-                   var sel = "";
-                   if ((doc != '') && (doc == obj.id)) {
-                       sel = "selected";
-                   }
-                   div_data += "<option value=" + obj.id + " " + sel + ">" + obj.name +" "+ obj.surname +" ("+ obj.employee_id +")</option>";
-               });
-               $("#doctorid").html("<option value=''>Select</option>");
-               $('#doctorid').append(div_data);
-           }
-       });
-   }
 </script>
 <script type="text/javascript">
 ( function ( $ ) {

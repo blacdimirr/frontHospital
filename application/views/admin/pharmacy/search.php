@@ -43,7 +43,7 @@ $currency_symbol = $this->customlib->getHospitalCurrencyFormat();
                                     <th><?php echo $this->lang->line('medicine_name'); ?></th>
                                     <th><?php echo $this->lang->line('medicine_company'); ?></th>
                                     <th><?php echo $this->lang->line('medicine_composition'); ?></th>
-                                    <!-- <th><?php // echo $this->lang->line('medicine_category'); ?></th>  -->
+                                    <th><?php echo $this->lang->line('medicine_category'); ?></th> 
                                     <th><?php echo $this->lang->line('medicine_group'); ?></th>
                                     <th><?php echo $this->lang->line('unit'); ?></th>
                                     <th><?php echo $this->lang->line('available_qty'); ?></th>
@@ -82,7 +82,7 @@ $currency_symbol = $this->customlib->getHospitalCurrencyFormat();
                                             <span class="text-danger"><?php echo form_error('medicine_name'); ?></span>
                                         </div>
                                     </div>
-                                    <div class="col-sm-3" style="display:none;">
+                                    <div class="col-sm-3">
                                         <div class="form-group">
                                             <label for="exampleInputFile">
                                                 <?php echo $this->lang->line('medicine_category'); ?></label>
@@ -276,7 +276,7 @@ $currency_symbol = $this->customlib->getHospitalCurrencyFormat();
                                             <span class="text-danger"><?php echo form_error('medicine_name'); ?></span>
                                         </div>
                                     </div> 
-                                    <div class="col-sm-3" style="display:none;">
+                                    <div class="col-sm-3">
                                         <div class="form-group">
                                             <label for="exampleInputFile">
                                                 <?php echo $this->lang->line('medicine_category'); ?></label>
@@ -419,7 +419,7 @@ $currency_symbol = $this->customlib->getHospitalCurrencyFormat();
                                             <td></td>
                                             <th width="15%"><?php echo $this->lang->line('medicine_name'); ?></th>
                                             <td width="35%"><span id='medicine_names'></span></td>
-                                            <!-- <th width="15%"><?php echo $this->lang->line('medicine_category'); ?></th> -->
+                                            <th width="15%"><?php echo $this->lang->line('medicine_category'); ?></th>
                                             <td width="35%"><span id="medicine_category_ids"></span>
                                             </td>
                                         </tr>

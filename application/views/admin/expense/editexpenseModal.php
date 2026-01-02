@@ -16,18 +16,18 @@ $currency_symbol = $this->customlib->getHospitalCurrencyFormat();
         <div class="col-sm-6">
             <div class="form-group">
                 <label for="exampleInputEmail1"><?php echo $this->lang->line('expense_head'); ?></label><small class="req"> *</small>
-                <select autofocus="" id="exp_head_id" name="exp_head_id" class="form-control">
+                <select autofocus="" id="exp_head_id" name="exp_head_id" class="form-control" >
                     <option value=""><?php echo $this->lang->line('select'); ?></option>
                     <?php
                     foreach ($expheadlist as $exphead) {
-                    ?>
-                        <option value="<?php echo $exphead['id'] ?>" <?php
-                                                                        if ($expense['exp_head_id'] == $exphead['id']) {
-                                                                            echo "selected =selected";
-                                                                        }
-                                                                        ?>><?php echo $exphead['exp_category'] ?></option>
+                        ?>
+                    <option value="<?php echo $exphead['id'] ?>"<?php
+                    if ($expense['exp_head_id'] == $exphead['id']) {
+                            echo "selected =selected";
+                        }
+                        ?>><?php echo $exphead['exp_category'] ?></option>
                     <?php
-                        $count++;
+                    $count++;
                     }
                     ?>
                 </select>
@@ -37,36 +37,36 @@ $currency_symbol = $this->customlib->getHospitalCurrencyFormat();
         <div class="col-sm-6">
             <div class="form-group">
                 <label for="exampleInputEmail1"><?php echo $this->lang->line('name'); ?></label><small class="req"> *</small>
-                <input id="name" name="name" placeholder="" type="text" class="form-control" value="<?php echo set_value('name', $expense['name']); ?>" />
-                <input id="expense_id" type="hidden" class="form-control" value="<?php echo $expense['id']; ?>" />
+                <input id="name" name="name" placeholder="" type="text" class="form-control"  value="<?php echo set_value('name', $expense['name']); ?>" />
+                <input id="expense_id"  type="hidden" class="form-control"  value="<?php echo $expense['id']; ?>" />
 
             </div>
         </div>
         <div class="col-sm-6">
             <div class="form-group">
                 <label for="exampleInputEmail1"><?php echo $this->lang->line('invoice_number'); ?></label>
-                <input id="invoice_no" name="invoice_no" placeholder="" type="text" class="form-control" value="<?php echo set_value('invoice_no', $expense['invoice_no']); ?>" />
+                <input id="invoice_no" name="invoice_no" placeholder="" type="text" class="form-control"  value="<?php echo set_value('invoice_no', $expense['invoice_no']); ?>" />
 
             </div>
         </div>
         <div class="col-sm-6">
             <div class="form-group">
                 <label for="exampleInputEmail1"><?php echo $this->lang->line('date'); ?></label><small class="req"> *</small>
-                <input id="editdate" name="date" placeholder="" type="text" class="form-control" value="<?php echo set_value('date', $this->customlib->YYYYMMDDTodateFormat($expense['date'])); ?>" readonly="readonly" />
+                <input id="editdate" name="date" placeholder="" type="text" class="form-control"  value="<?php echo set_value('date', $this->customlib->YYYYMMDDTodateFormat($expense['date'])); ?>" readonly="readonly" />
 
             </div>
         </div>
         <div class="col-sm-6">
             <div class="form-group">
                 <label for="exampleInputEmail1"><?php echo $this->lang->line('amount') . " (" . $currency_symbol . ")"; ?></label><small class="req"> *</small>
-                <input id="amount" name="amount" placeholder="" type="text" class="form-control" value="<?php echo set_value('amount', $expense['amount']); ?>" />
+                <input id="amount" name="amount" placeholder="" type="text" class="form-control"  value="<?php echo set_value('amount', $expense['amount']); ?>" />
 
             </div>
         </div>
         <div class="col-sm-6">
             <div class="form-group">
                 <label for="exampleInputEmail1"><?php echo $this->lang->line('attach_document'); ?></label>
-                <input id="documents" name="documents" placeholder="" type="file" class="filestyle form-control" value="<?php echo set_value('documents'); ?>" />
+                <input id="documents" name="documents" placeholder="" type="file" class="filestyle form-control"  value="<?php echo set_value('documents'); ?>" />
             </div>
         </div>
         <div class="col-sm-12">
@@ -76,22 +76,7 @@ $currency_symbol = $this->customlib->getHospitalCurrencyFormat();
 
             </div>
         </div>
-        <div class=""> <?php echo display_custom_fields('expenses', $expense['id']); ?> </div>
-
-        <div class="col-sm-6">
-            <div class="form-group">
-                <label for="exampleInputEmail1"><?php echo $this->lang->line('evidence'); ?></label>
-                <input id="documents_other" name="documents_other" placeholder="" type="file" class="filestyle form-control" value="<?php echo set_value('documents_other'); ?>" />
-            </div>
-        </div>
-        <!-- Gastos -->
-        <div class="col-sm-6" >
-            <div class="form-group">
-                <label for="exampleInputEmail1"><?php echo $this->lang->line('income'); ?> <small class="req"> *</small></label>
-                <input id="amount_income" name="amount_income" readonly placeholder="" type="text" class="form-control" value="<?php echo $amount_income; ?>" />
-            </div>
-        </div>
-
+         <div class=""> <?php echo display_custom_fields('expenses',$expense['id']); ?> </div>
     </div><!-- /.box-body -->
     <div class="row">
         <div class="box-footer">
@@ -102,10 +87,10 @@ $currency_symbol = $this->customlib->getHospitalCurrencyFormat();
     </div>
 </form>
 <script type="text/javascript">
-    $(document).ready(function() {
+    $(document).ready(function () {
         $('.filestyle').dropify();
     });
-    $(document).ready(function() {
+    $(document).ready(function () {
         var date_format = '<?php echo $result = strtr($this->customlib->getHospitalDateFormat(), ['d' => 'dd', 'm' => 'mm', 'Y' => 'yyyy']) ?>';
         $('#editdate').datepicker({
 
@@ -114,8 +99,8 @@ $currency_symbol = $this->customlib->getHospitalCurrencyFormat();
             autoclose: true
         });
     });
-    $(document).ready(function(e) {
-        $("#editexpense").on('submit', (function(e) {
+    $(document).ready(function (e) {
+        $("#editexpense").on('submit', (function (e) {
             $("#editexpensebtn").button('loading');
 
             var id = $("#expense_id").val();
@@ -129,10 +114,10 @@ $currency_symbol = $this->customlib->getHospitalCurrencyFormat();
                 contentType: false,
                 cache: false,
                 processData: false,
-                success: function(data) {
+                success: function (data) {
                     if (data.status == "fail") {
                         var message = "";
-                        $.each(data.error, function(index, value) {
+                        $.each(data.error, function (index, value) {
                             message += value;
                         });
                         errorMsg(message);
@@ -143,7 +128,7 @@ $currency_symbol = $this->customlib->getHospitalCurrencyFormat();
                     $("#editexpensebtn").button('reset');
 
                 },
-                error: function() {
+                error: function () {
                     alert("Fail")
                 }
             });
