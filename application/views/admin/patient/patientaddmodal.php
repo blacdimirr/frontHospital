@@ -174,6 +174,18 @@ $nationality_array          = $this->staff_model->getNationalities();
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group">
+                                                <label><?php echo $this->lang->line("documento_tipo"); ?></label>
+                                                <input name="documento_tipo" placeholder="" class="form-control" value="<?php echo set_value('documento_tipo'); ?>" />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <label><?php echo $this->lang->line("documento_numero"); ?></label>
+                                                <input name="documento_numero" placeholder="" class="form-control" value="<?php echo set_value('documento_numero'); ?>" />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
                                                 <label><?php echo $this->lang->line("nationality"); ?></label>
                                                 <select name="nationality" class="form-control">
                                                     <option value="República Dominicana (la)">República Dominicana (la)</option>
@@ -183,6 +195,57 @@ $nationality_array          = $this->staff_model->getNationalities();
                                                     <?php } ?>
                                                 </select>
                                             </div> 
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label><?php echo $this->lang->line("direccion_detallada"); ?></label>
+                                                <textarea name="direccion_detallada" class="form-control"><?php echo set_value('direccion_detallada'); ?></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <label><?php echo $this->lang->line("municipio"); ?></label>
+                                                <input name="municipio" placeholder="" class="form-control" value="<?php echo set_value('municipio'); ?>" />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <label><?php echo $this->lang->line("provincia"); ?></label>
+                                                <input name="provincia" placeholder="" class="form-control" value="<?php echo set_value('provincia'); ?>" />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label><?php echo $this->lang->line("contacto_emergencia"); ?></label>
+                                                <input name="contacto_emergencia" placeholder="" class="form-control" value="<?php echo set_value('contacto_emergencia'); ?>" />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label><?php echo $this->lang->line("responsable_legal"); ?></label>
+                                                <input name="responsable_legal" placeholder="" class="form-control" value="<?php echo set_value('responsable_legal'); ?>" />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <label><?php echo $this->lang->line("consentimiento_datos"); ?></label>
+                                                <div class="checkbox">
+                                                    <label>
+                                                        <input type="checkbox" name="consentimiento_datos" value="1">
+                                                        <?php echo $this->lang->line("consentimiento_datos"); ?>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <label><?php echo $this->lang->line("fecha_consentimiento"); ?></label>
+                                                <input name="fecha_consentimiento" placeholder="" class="form-control date" value="<?php echo set_value('fecha_consentimiento'); ?>" />
+                                            </div>
+                                        </div>
+                                        <input type="hidden" name="sexo" id="sexo_value" value="">
+                                        <div class="col-sm-12">
+                                            <div class="alert alert-warning" id="possible-duplicate-alert" style="display:none;"></div>
                                         </div>
                                         <div class="">
                                             
@@ -212,44 +275,116 @@ $nationality_array          = $this->staff_model->getNationalities();
 
 <script type="text/javascript">
     $(document).ready(function (e) {
-        $("#formaddpa").on('submit', (function (e) {
-        let clicked_submit_btn= $(this).closest('form').find(':submit');
-            e.preventDefault();
-            $.ajax({
-                url: '<?php echo base_url(); ?>admin/patient/addpatient',
-                type: "POST",
-                data: new FormData(this),
-                dataType: 'json',
-                contentType: false,
-                cache: false,
-                processData: false,
-                 beforeSend: function() {
-                 clicked_submit_btn.button('loading') ; 
+        var duplicateAlert = $("#possible-duplicate-alert");
+        var duplicateResults = [];
 
+        function renderDuplicateAlert(results) {
+            if (!results.length) {
+                duplicateAlert.hide().empty();
+                return;
+            }
+            var items = results.map(function (item) {
+                var birth = item.fecha_nacimiento ? item.fecha_nacimiento : item.dob;
+                var doc = item.documento_tipo && item.documento_numero ? (item.documento_tipo + " " + item.documento_numero) : "";
+                return "<li><strong>" + item.patient_name + "</strong> (" + item.id + ") - " + (birth || "") + " " + doc + "</li>";
+            });
+            duplicateAlert.html("<strong><?php echo $this->lang->line('possible_duplicates'); ?></strong><ul>" + items.join('') + "</ul>").show();
+        }
+
+        function checkDuplicates(callback) {
+            var documentoTipo = $('input[name="documento_tipo"]').val();
+            var documentoNumero = $('input[name="documento_numero"]').val();
+            var patientName = $('input[name="name"]').val();
+            var dob = $('input[name="dob"]').val();
+            if (!documentoTipo && !documentoNumero && !patientName && !dob) {
+                duplicateResults = [];
+                renderDuplicateAlert([]);
+                if (callback) {
+                    callback(false);
+                }
+                return;
+            }
+
+            $.ajax({
+                url: '<?php echo base_url(); ?>admin/patient/possibleduplicates',
+                type: "POST",
+                dataType: "json",
+                data: {
+                    documento_tipo: documentoTipo,
+                    documento_numero: documentoNumero,
+                    name: patientName,
+                    dob: dob
                 },
                 success: function (data) {
-                    if (data.status == "fail") {
-                        var message = "";
-                        $.each(data.error, function (index, value) {
-                            message += value;
-                        });
-                        errorMsg(message);
-                    } else {
-                        successMsg(data.message);
-                        
-                        $("#myModalpa").modal('toggle');
-                        addappointmentModal(data.id, 'myModal');
+                    duplicateResults = data.data || [];
+                    renderDuplicateAlert(duplicateResults);
+                    if (callback) {
+                        callback(duplicateResults.length > 0);
                     }
-                        clicked_submit_btn.button('reset'); 
                 },
-                 error: function(xhr) { // if error occured
-        alert('<?php echo $this->lang->line("error_occurred_please_try_again"); ?>');
+                error: function () {
+                    if (callback) {
+                        callback(false);
+                    }
+                }
+            });
+        }
 
-         clicked_submit_btn.button('reset') ; 
-             },
-    complete: function() {
-     clicked_submit_btn.button('reset') ; 
-    }
+        $("#addformgender").on('change', function () {
+            $("#sexo_value").val($(this).val());
+        }).trigger('change');
+
+        $('input[name="documento_tipo"], input[name="documento_numero"], input[name="name"], input[name="dob"]').on('blur', function () {
+            checkDuplicates();
+        });
+
+        $("#formaddpa").on('submit', (function (e) {
+            let clicked_submit_btn= $(this).closest('form').find(':submit');
+            e.preventDefault();
+            var form = this;
+
+            checkDuplicates(function (hasDuplicates) {
+                if (hasDuplicates) {
+                    var proceed = confirm('<?php echo $this->lang->line("record_already_exists"); ?>');
+                    if (!proceed) {
+                        return;
+                    }
+                }
+
+                $.ajax({
+                    url: '<?php echo base_url(); ?>admin/patient/addpatient',
+                    type: "POST",
+                    data: new FormData(form),
+                    dataType: 'json',
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+                    beforeSend: function() {
+                        clicked_submit_btn.button('loading') ; 
+                    },
+                    success: function (data) {
+                        if (data.status == "fail") {
+                            var message = "";
+                            $.each(data.error, function (index, value) {
+                                message += value;
+                            });
+                            errorMsg(message);
+                        } else {
+                            successMsg(data.message);
+                            
+                            $("#myModalpa").modal('toggle');
+                            addappointmentModal(data.id, 'myModal');
+                        }
+                        clicked_submit_btn.button('reset'); 
+                    },
+                    error: function(xhr) { // if error occured
+                        alert('<?php echo $this->lang->line("error_occurred_please_try_again"); ?>');
+                        clicked_submit_btn.button('reset') ; 
+                    },
+                    complete: function() {
+                        clicked_submit_btn.button('reset') ; 
+                    }
+                });
             });
         }));
     });

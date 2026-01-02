@@ -189,6 +189,46 @@ class Patient_model extends MY_Model
         }
     }
 
+    public function findPossibleDuplicates($filters)
+    {
+        $documento_tipo = trim($filters['documento_tipo'] ?? '');
+        $documento_numero = trim($filters['documento_numero'] ?? '');
+        $patient_name = trim($filters['patient_name'] ?? $filters['name'] ?? '');
+        $fecha_nacimiento = $filters['fecha_nacimiento'] ?? $filters['dob'] ?? null;
+
+        if ($documento_tipo === '' && $documento_numero === '' && $patient_name === '' && empty($fecha_nacimiento)) {
+            return array();
+        }
+
+        $this->db->select('id, patient_name, dob, fecha_nacimiento, documento_tipo, documento_numero, mobileno, email');
+        $this->db->from('patients');
+
+        $has_conditions = false;
+        if ($documento_tipo !== '' && $documento_numero !== '') {
+            $this->db->group_start();
+            $this->db->where('documento_tipo', $documento_tipo);
+            $this->db->where('documento_numero', $documento_numero);
+            $this->db->group_end();
+            $has_conditions = true;
+        }
+
+        if ($patient_name !== '' && !empty($fecha_nacimiento)) {
+            if ($has_conditions) {
+                $this->db->or_group_start();
+            } else {
+                $this->db->group_start();
+            }
+            $this->db->where('patient_name', $patient_name);
+            $this->db->group_start();
+            $this->db->where('fecha_nacimiento', $fecha_nacimiento);
+            $this->db->or_where('dob', $fecha_nacimiento);
+            $this->db->group_end();
+            $this->db->group_end();
+        }
+
+        return $this->db->get()->result_array();
+    }
+
     public function valid_patient($id)
     {
         $this->db->select('ipd_details.patient_id,ipd_details.discharged,patients.id as pid');
