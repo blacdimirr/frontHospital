@@ -20,6 +20,7 @@ class patient extends Admin_Controller
         $this->load->library('mailsmsconf');
         $this->load->library('CSVReader');
         $this->load->library('Customlib');
+        $this->load->library('AuditService');
         $this->load->library('system_notification');
         $this->load->library('datatables');
         $this->marital_status  = $this->config->item('marital_status');
@@ -1115,6 +1116,11 @@ This Function is used to Add Patient
                 $data_img = array('id' => $insert_id, 'image' => 'uploads/patient_images/no_image.png');
             }
             $this->patient_model->add($data_img);
+
+            $this->auditservice->log('expediente', 'CREATE', 'patient', $insert_id, array(
+                'patient_name' => $this->input->post('name'),
+                'mobileno' => $this->input->post('mobileno'),
+            ));
 
             $sender_details = array('id' => $insert_id, 'credential_for' => 'patient', 'username' => $this->patient_login_prefix . $insert_id, 'password' => $user_password, 'contact_no' => $this->input->post('mobileno'), 'email' => $this->input->post('email'));
 
@@ -2713,6 +2719,10 @@ This Function is used to Import Multiple Patient Records
         // print_r($data['fields_historial'] );
         // die();
 
+        $this->auditservice->log('expediente', 'VIEW', 'patient', $id, array(
+            'seccion' => 'opd',
+        ));
+
         $this->load->view("layout/header");
         $this->load->view("admin/patient/profile", $data);
         $this->load->view("layout/footer");
@@ -2953,6 +2963,11 @@ This Function is used to Import Multiple Patient Records
         $data["patients"]           = $patients;
         $data['organisation']       = $this->organisation_model->get();
         $data["id"]                 = $id;
+
+        $this->auditservice->log('expediente', 'VIEW', 'patient', $id, array(
+            'seccion' => 'ipd',
+            'ipd_id' => $ipdid,
+        ));
         $data["ipdid"]              = $ipdid;
         $data["patient_id"]         = $id;
         $doctors                    = $this->staff_model->getStaffbyrole(3);
@@ -3083,6 +3098,9 @@ This Function is used to Import Multiple Patient Records
         $data['id']            = $id;
         if (isset($_POST['print'])) {
             $data["print"] = 'yes';
+            $this->auditservice->log('pdfs', 'PRINT', 'discharge_summary', $id, array(
+                'tipo' => 'ipd',
+            ));
         } else {
             $data["print"] = 'no';
         }
@@ -3098,6 +3116,9 @@ This Function is used to Import Multiple Patient Records
         $data['id']            = $id;
         if (isset($_POST['print'])) {
             $data["print"] = 'yes';
+            $this->auditservice->log('pdfs', 'PRINT', 'opd_summary', $id, array(
+                'tipo' => 'opd',
+            ));
         } else {
             $data["print"] = 'no';
         }
@@ -4660,6 +4681,9 @@ This Function is used to Import Multiple Patient Records
         $cutom_fields_data             = get_custom_table_values($opd_id, 'opd');
         $data['field_data']          = $cutom_fields_data;
         $page = $this->load->view('admin/patient/_printbill', $data, true);
+        $this->auditservice->log('pdfs', 'PRINT', 'opd_bill', $opd_id, array(
+            'patient_id' => !empty($opddata) ? $opddata['patient_id'] : null,
+        ));
         echo json_encode(array('status' => 1, 'page' => $page));
     }
 
@@ -4703,6 +4727,9 @@ This Function is used to Import Multiple Patient Records
         // $page = $this->load->view('admin/patient/print_historia_clinica', $data, true);
         // $page = $this->load->view('admin/patient/print_egrego', $data, true);
         $page = $this->load->view('admin/patient/print_orden_medica', $data, true);
+        $this->auditservice->log('pdfs', 'PRINT', 'orden_medica', $opd_id, array(
+            'patient_id' => !empty($opddata) ? $opddata['patient_id'] : null,
+        ));
         echo json_encode(array('status' => 1, 'page' => $page));
     }
 
@@ -4747,6 +4774,9 @@ This Function is used to Import Multiple Patient Records
         $page = $this->load->view('admin/patient/print_historia_clinica', $data, true);
         // $page = $this->load->view('admin/patient/print_egrego', $data, true);
         // $page = $this->load->view('admin/patient/print_orden_medica', $data, true);
+        $this->auditservice->log('pdfs', 'PRINT', 'historial_clinico', $opd_id, array(
+            'patient_id' => !empty($opddata) ? $opddata['patient_id'] : null,
+        ));
         echo json_encode(array('status' => 1, 'page' => $page));
     }
 
@@ -4965,6 +4995,13 @@ This Function is used to Import Multiple Patient Records
             if (!empty($visible_module)) {
                 $notification_array['visible_module'] = $visible_module;
                 $this->system_notification->send_system_notification('notification_opd_prescription_created', $event_data, $notification_array);
+            }
+
+            if ($ipd_prescription_basic_id > 0) {
+                $this->auditservice->log('ordenes', 'UPDATE', 'orden_medica', $basic_id, array(
+                    'visit_details_id' => $visitid,
+                    'opd_id' => $opd_id,
+                ));
             }
 
             $array = array('status' => 'success', 'error' => '', 'message' => $this->lang->line('success_message'), 'visitid' => $visitid);
@@ -5255,6 +5292,10 @@ This Function is used to Import Multiple Patient Records
 
             $basic_id       = $this->prescription_model->add_hoja_ingreso($opd_basic_array);
 
+            $this->auditservice->log('notas_medicas', 'UPDATE', 'hoja_ingreso', $basic_id, array(
+                'visit_details_id' => $this->input->post('visit_id'),
+            ));
+
             $array = array('status' => 'success', 'error' => '', 'message' => $this->lang->line('success_message'), 'visitid' => $this->input->post('visit_id'));
         }
 
@@ -5380,6 +5421,10 @@ This Function is used to Import Multiple Patient Records
             );
 
             $basic_id       = $this->prescription_model->add_Interconsultation($opd_basic_array);
+
+            $this->auditservice->log('notas_medicas', 'UPDATE', 'formulario_interconsulta', $basic_id, array(
+                'visit_details_id' => $this->input->post('visit_id'),
+            ));
 
             $array = array('status' => 'success', 'error' => '', 'message' => $this->lang->line('success_message'), 'visitid' => $this->input->post('visit_id'));
         }
