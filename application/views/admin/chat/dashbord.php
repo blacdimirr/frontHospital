@@ -56,7 +56,8 @@
                 <div class="">
                     <div class="">
                         <form id="form1" name="employeeform" method="post" accept-charset="utf-8" enctype="multipart/form-data">
-                            <input type="hidden" name="ci_csrf_token" value="">                            <div id="upload_documents_hide_show">                                               
+                            <?php echo $this->customlib->getCSRF(); ?>
+                            <div id="upload_documents_hide_show">                                               
 
                                 <h4></h4>
                                 <div class="col-md-12">

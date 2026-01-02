@@ -13,7 +13,7 @@ $currency_symbol = $this->customlib->getHospitalCurrencyFormat();
                  
                      <div class="box-body">
                         <form action="<?= base_url(); ?>admin/patient/patientbillreport" method="post" class="form-inline">
-                            <input type="hidden" name="ci_csrf_token" value="">
+                            <?php echo $this->customlib->getCSRF(); ?>
                             <div class="form-group" id="patient_id">
                                 <label><?php echo $this->lang->line('case_id'); ?></label><small class="req"> *</small>
                                 <input id="case_reference_id" name="case_reference_id" placeholder="<?= $this->lang->line("case_id"); ?>" type="text" class="form-control" value="<?php echo set_value('case_reference_id'); ?>"  />
