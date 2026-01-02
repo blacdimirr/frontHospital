@@ -1,5 +1,6 @@
 $(document).ready(function () {
-        var table = $('.example').DataTable({
+        var $exampleTable = $('.example');
+        var table = $exampleTable.DataTable({
             "aaSorting": [],           
             rowReorder: {
             selector: 'td:nth-child(2)'
@@ -68,6 +69,16 @@ $(document).ready(function () {
                 }
             ]
         });
+
+        if (window.HISLoading && typeof window.HISLoading.showTable === 'function') {
+            $exampleTable.on('processing.dt', function (event, settings, processing) {
+                if (processing) {
+                    window.HISLoading.showTable($(this), 'Cargando resultados...');
+                } else {
+                    window.HISLoading.hideTable($(this));
+                }
+            });
+        }
     });
 
 
@@ -238,7 +249,17 @@ $(document).ready(function(){
         'data': params,
      }
      
-    });
+            });
+
+        if (window.HISLoading && typeof window.HISLoading.showTable === 'function') {
+            $('.' + _selector).on('processing.dt', function (event, settings, processing) {
+                if (processing) {
+                    window.HISLoading.showTable($(this), 'Cargando resultados...');
+                } else {
+                    window.HISLoading.hideTable($(this));
+                }
+            });
+        }
     }
 
    function emptyDatatable(_selector,dataSrc="data"){

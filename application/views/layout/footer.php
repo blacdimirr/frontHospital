@@ -5,6 +5,12 @@
 </footer>
 <div class="control-sidebar-bg"></div>
 </div>
+<div id="global-loading-overlay" class="loading-overlay" aria-live="polite" aria-busy="true">
+    <div class="loading-overlay__content">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Procesando...</div>
+    </div>
+</div>
 <script>
     $.widget.bridge('uibutton', $.ui.button);
 </script>
@@ -13,6 +19,7 @@
 <script src="<?php echo base_url(); ?>backend/toast-alert/toastr.js"></script>
 <script src="<?php echo base_url(); ?>backend/bootstrap/js/bootstrap.min.js"></script>
 <script src="<?php echo base_url(); ?>backend/plugins/select2/select2.full.min.js"></script>
+<script src="<?php echo base_url(); ?>backend/dist/js/loading-overlay.js"></script>
 <script type="text/javascript">
     (function ($) {
         var csrfTokenName = "<?php echo $this->security->get_csrf_token_name(); ?>";

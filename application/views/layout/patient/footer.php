@@ -4,6 +4,12 @@
 </footer>
 <div class="control-sidebar-bg"></div>
 </div>
+<div id="global-loading-overlay" class="loading-overlay" aria-live="polite" aria-busy="true">
+    <div class="loading-overlay__content">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Procesando...</div>
+    </div>
+</div>
 <script>
     $.widget.bridge('uibutton', $.ui.button);
 </script>
@@ -11,6 +17,7 @@
 <link href="<?php echo base_url(); ?>backend/toast-alert/toastr.css" rel="stylesheet"/>
 <script src="<?php echo base_url(); ?>backend/toast-alert/toastr.js"></script>
 <script src="<?php echo base_url(); ?>backend/bootstrap/js/bootstrap.min.js"></script>
+<script src="<?php echo base_url(); ?>backend/dist/js/loading-overlay.js"></script>
 <script src="<?php echo base_url(); ?>backend/dist/js/raphael-min.js"></script>
 <script src="<?php echo base_url(); ?>backend/plugins/morris/morris.min.js"></script>
 <script src="<?php echo base_url(); ?>backend/plugins/sparkline/jquery.sparkline.min.js"></script>
