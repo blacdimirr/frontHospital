@@ -14,6 +14,9 @@ class Issueitem extends Admin_Controller
         $this->load->library('datatables');
         $this->config->load("payroll");
         $this->search_type = $this->config->item('search_type');
+
+        require_once 'application\libraries\api\inventario_external.php';
+        require_once 'application\libraries\icd-api\classes\response.class.php';
     }
 
     public function index()
@@ -27,11 +30,71 @@ class Issueitem extends Admin_Controller
         $data['title_list']  = $this->lang->line('recent_issue_items');
         $roles               = $this->role_model->get();
         $data['roles']       = $roles;
-        $itemcategory        = $this->itemcategory_model->get();
-        $data['itemcatlist'] = $itemcategory;
+
+        // $itemcategory        = $this->itemcategory_model->get();
+        // $data['itemcatlist'] = $itemcategory;
+
+        $itemstore        = $this->itemstore_model->get();
+        $data['itemstorelist'] = $itemstore;
+
+        $itemcategory = $this->getCategorias();
+        $responses = json_decode($itemcategory, true);
+        $productos = $responses['data']['data'];
+        $data['itemcatlist'] = $productos;
+
         $this->load->view('layout/header', $data);
         $this->load->view('admin/issueitem/issueitemList', $data);
         $this->load->view('layout/footer', $data);
+    }
+
+    public function getCategorias()
+    {
+        $response = new Response();
+
+        $url = 'https://account.ardan.com.do/api/categories';
+
+        $inventario_api_client = new INVENTARIO_API_Client($url);
+        $response->set(1, $inventario_api_client->get());
+
+        return $response->encode();
+    }
+
+    public function getOneProduct($sku)
+    {
+        $response = new Response();
+
+        $url = 'https://account.ardan.com.do/api/product/' . $sku;
+
+        $inventario_api_client = new INVENTARIO_API_Client($url);
+        $response->set(1, $inventario_api_client->get());
+
+        return $response->encode();
+    }
+
+    public function getItemByCategory()
+    {
+        $response = new Response();
+
+        $url = 'https://account.ardan.com.do/api/products';
+
+        $categoria_id = $_GET['item_category_id'];
+        // print_r($_GET['item_category_id']);
+        // die();
+
+        $inventario_api_client = new INVENTARIO_API_Client($url);
+        $response->set(1, $inventario_api_client->get());
+
+        $productos = json_decode($response->encode(), true);
+
+        $array_productos = array();
+
+        foreach ($productos['data']['data'] as $key => $value) {
+            if ($value['category_id'] == $categoria_id) {
+                array_push($array_productos, $value);
+            }
+        }
+
+        echo json_encode($array_productos);
     }
 
     public function getissueitemdatatable()
@@ -54,7 +117,7 @@ class Issueitem extends Admin_Controller
 
                 $action = "<div class='rowoptionview rowview-mt-19'>";
                 $link   = "<a href='#' class='detail_popover'  data-toggle='popover' title=''>";
-                $div    = "<div class='fee_detail_popover' style='display: none'>";
+                // $div    = "<div class='fee_detail_popover' style='display: none'>";
 
                 if ($value->note == "") {
                     $text = "<p class='text text-danger'>" . $this->lang->line('no_description') . "</p>";
@@ -63,22 +126,24 @@ class Issueitem extends Admin_Controller
                 }
 
                 if ($value->is_returned == 1) {
-                    $status = "<span  class='label label-danger item_remove'  data-item='" . $value->id . "' data-category='" . $value->item_category . "' data-item_name='" . $value->item_name . "' data-quantity='" . $value->quantity . "' data-toggle='modal' data-target='#confirm-delete' title=''>" . $this->lang->line('click_to_return') . "</span>";
+                    $status = "<span  class='label label-danger item_remove'  data-item='" . $value->id . "' data-category='" . $value->item_category . "' data-item_name='" . $value->item_name . "' data-quantity='" . $value->quantity . "' data-sku='" . $value->sku . "' data-toggle='modal' data-target='#confirm-update' title=''>" . $this->lang->line('click_to_return') . "</span>";
                 } else {
                     $status = "<span class='label label-success'>" . $this->lang->line('returned') . "</span>";
                 }
 
                 if ($this->rbac->hasPrivilege('issue_item', 'can_delete')) {
+                    $action .= "<a href='#' onclick='print_record(" . $value->id . ")' class='btn btn-default btn-xs'  data-toggle='tooltip' title='" . $this->lang->line('print') . "'><i class='fa fa-print'></i></a>";
                     $action .= "<a href='#' onclick='delete_record(" . $value->id . ")' class='btn btn-default btn-xs'  data-toggle='tooltip' title='" . $this->lang->line('delete') . "'><i class='fa fa-trash'></i></a>";
                 }
 
                 //==============================
-                $row[]     = $link . $value->item_name . '</a>' . $div . $text . "</div>" . $action;
-                $row[]     = $value->item_category;
+                // $row[]     = $link . $value->item_name_api . '</a>' . $div . $text . "</div>" . $action;
+                $row[]     = $value->item_store_name . $action;
+                // $row[]     = $value->item_category;
                 $row[]     = $this->customlib->YYYYMMDDTodateFormat($value->issue_date) . ' - ' . $this->customlib->YYYYMMDDTodateFormat($value->return_date);
                 $row[]     = $value->name . " " . $value->docname . " " . $value->docsurname . " (" . $value->employee_id . ")";
                 $row[]     = $value->issue_by;
-                $row[]     = $value->quantity;
+                // $row[]     = $value->quantity;
                 $row[]     = $status;
                 $row[]     = "";
                 $dt_data[] = $row;
@@ -114,62 +179,229 @@ class Issueitem extends Admin_Controller
         $this->form_validation->set_rules('issue_to', $this->lang->line('issue_to'), 'required|trim|xss_clean');
         $this->form_validation->set_rules('issue_by', $this->lang->line('issue_by'), 'required|trim|xss_clean');
         $this->form_validation->set_rules('issue_date', $this->lang->line('issue_date'), 'required|trim|xss_clean');
-        $this->form_validation->set_rules('item_category_id', $this->lang->line('item_category'), 'required|trim|xss_clean');
-        $this->form_validation->set_rules('item_id', $this->lang->line('item'), 'required|trim|xss_clean');
-        $this->form_validation->set_rules('quantity', $this->lang->line('quantity'), 'trim|greater_than[0]|required|xss_clean|callback_check_available_quantity');
+        $this->form_validation->set_rules('item_category_id[]', $this->lang->line('item_category'), 'required|trim|xss_clean');
+        // $this->form_validation->set_rules('item_id', $this->lang->line('item'), 'required|trim|xss_clean');
+        // $this->form_validation->set_rules('quantity', $this->lang->line('quantity'), 'trim|greater_than[0]|required|xss_clean|callback_check_available_quantity');
+        $this->form_validation->set_rules('quantity[]', $this->lang->line('quantity'), 'trim|required|greater_than[0]|callback_check_available_quantity');
+
+
         if ($this->form_validation->run() == false) {
             $data = array(
                 'account_type'     => form_error('account_type'),
                 'issue_to'         => form_error('issue_to'),
                 'issue_by'         => form_error('issue_by'),
                 'issue_date'       => form_error('issue_date'),
-                'quantity'         => form_error('quantity'),
-                'item_category_id' => form_error('item_category_id'),
-                'item_id'          => form_error('item_id'),
+                'quantity[]'         => form_error('quantity[]'),
+                'item_category_id' => form_error('item_category_id[]'),
+                // 'item_id'          => form_error('item_id'),
+                // 'item_store_id'          => form_error('item_store_id'),
             );
 
             $array = array('status' => 'fail', 'error' => $data);
         } else {
+
             $return_date = "";
             $date        = $this->input->post('return_date');
             $issue_date  = $this->input->post('issue_date');
             if (($this->input->post('return_date')) != "") {
                 $return_date = $this->customlib->dateFormatToYYYYMMDD($date);
             }
+
             $data = array(
                 'issue_to'         => $this->input->post('issue_to'),
                 'issue_by'         => $this->input->post('issue_by'),
                 'issue_date'       => $this->customlib->dateFormatToYYYYMMDD($issue_date),
                 'return_date'      => $return_date,
                 'note'             => $this->input->post('note'),
-                'quantity'         => $this->input->post('quantity'),
+                // 'quantity'         => $this->input->post('quantity'),
                 'issue_type'       => $this->input->post('account_type'),
-                'item_category_id' => $this->input->post('item_category_id'),
-                'item_id'          => $this->input->post('item_id'),
+                // 'item_category_id' => $this->input->post('item_category_id'),
+                // 'item_id'          => $this->input->post('item_id_id'),
+                // 'sku'          => $this->input->post('sku'),
+                // 'item_name_api'          => $this->input->post('item_name_api'),
+                // 'item_store_id'          => $this->input->post('item_store_id'),
             );
 
-            $this->itemissue_model->add($data);
+            $item_issue_id = $this->itemissue_model->add($data);
+
+            foreach ($this->input->post('item_id_') as $key => $item) {
+                $json = json_decode($item);
+
+                $data = array(
+                    'item_issue_id'       => $item_issue_id,
+                    'item_category_id' => $this->input->post('item_category_id')[$key],
+                    'item_category_name' => $json->category->name,
+                    'item_id'          => $json->id,
+                    'sku'          => $json->sku,
+                    'item_name_api'          => $json->name,
+                    'unit'          => $json->unit->name,
+                    'quantity'         => $this->input->post('quantity')[$key],
+                    // 'item_store_id'          => $this->input->post('item_store_id')[$key]
+                );
+                $this->itemissue_model->add_details($data);
+            }
+
+            foreach ($this->input->post('item_id_') as $key => $item) {
+                $json = json_decode($item);
+
+                $quantity = $json->quantity - $this->input->post('quantity')[$key];
+
+                $up = $this->updateProduct($json->sku, $quantity);
+            }
+
             $array = array('status' => 'success', 'error' => '', 'message' => $this->lang->line('success_message'));
+
+            // $response = new Response();
+            // $sku = $this->input->post('sku');
+
+            // $url = 'https://account.ardan.com.do/api/update_product_bySku/' . $sku . '/update';
+
+            // $data = [
+            //     'quantity' => $this->input->post('quantity'),
+            // ];
+
+            // $jsonData = json_encode($data);
+
+            // $inventario_api_client = new INVENTARIO_API_Client($url);
+            // $response->set(1, $inventario_api_client->postData($jsonData));
+
+            // $productos = json_decode($response->encode(), true);
         }
         echo json_encode($array);
     }
 
+    public function get_item_issue_details()
+    {
+
+        $item_issue_id = $this->input->get("item_issue_id");
+
+        $result['details'] = ($this->itemissue_model->get_item_issue_details($item_issue_id));
+        echo json_encode($result);
+    }
+
+    public function updateProduct($sku, $quantity)
+    {
+        $response = new Response();
+
+        $url = 'https://account.ardan.com.do/api/update_product_bySku/' . $sku . '/update';
+
+        $data = [
+            'quantity' => $quantity,
+        ];
+
+        $jsonData = json_encode($data);
+
+
+        $inventario_api_client = new INVENTARIO_API_Client($url);
+        $response->set(1, $inventario_api_client->postData($jsonData));
+
+        $productos = json_decode($response->encode(), true);
+    }
+
     public function check_available_quantity()
     {
-        $item_category_id = $this->input->post('item_category_id');
-        $item_id          = $this->input->post('item_id');
-        $quantity         = $this->input->post('quantity');
-        if ($quantity != "" && $item_category_id != "" && $item_id != "") {
-            $data      = $this->item_model->getItemAvailable($item_id);
-            $available = ($data['added_stock'] - $data['issued']);
-            if ($quantity <= $available) {
-                return true;
+        $quantities = $this->input->post('item_id_');
+
+        $item_ids = $this->input->post('quantity');
+
+        $array_error = array();
+
+        foreach ($quantities as $key => $item) {
+            $value = json_decode($item_ids[$key]);
+            $json = json_decode($item);
+
+            if (json_last_error() !== JSON_ERROR_NONE || !isset($json->quantity)) {
+                $this->form_validation->set_message('check_available_quantity', $this->lang->line('invalid_item_data'));
+                return false;
             }
-            $this->form_validation->set_message('check_available_quantity', $this->lang->line('available_quantity') . " " . $available);
-            return false;
+
+            if ($value > $json->quantity) {
+                array_push(
+                    $array_error,
+                    array('error' => $this->form_validation->set_message('check_available_quantity', $this->lang->line('available_quantity') . " : " .  $value . ", " . $json->name))
+                );
+                return false;
+            }
         }
         return true;
     }
+
+    public function get_print($id)
+    {
+        $data = array();
+
+        $print_details         = $this->printing_model->get('', 'opd');
+        $data['print_details'] = $print_details;
+
+        // $detalle = $this->itemissue_model->get_ordenes_compra_detalle($id);
+        $detalle = $this->itemissue_model->get_item_issue_details($id);
+
+        // echo json_encode($result);
+
+        // print_r( $detalle);
+        // die();
+        if (!empty($detalle)) {
+            $data['issue_to'] = $detalle[0]['staff_name'];
+            $data['issue_by'] = $detalle[0]['issue_by'];
+            $data['issue_date'] = $detalle[0]['issue_date'];
+            $data['note'] = $detalle[0]['_note'];
+            $data['_id'] = generarSecuencia($detalle[0]['_id']);
+        } else {
+            $data['issue_to'] = '';
+            $data['issue_by'] = '';
+            $data['issue_date'] = '';
+            $data['note'] = '';
+            $data['_id'] = generarSecuencia(0);
+        }
+        $data['products'] = $detalle;
+
+        // $data['products'] = array([
+        //     'item' => 'Jeringa descartable 10 ml con aguja 21 g x 1 1/2',
+        //     'quantity' => '5'
+        // ]);
+
+        $page           = $this->load->view('admin/issueitem/_printbill.php', $data, true);
+        // $page           = $this->load->view('admin/patient/_printprescription', $data, true);
+        echo json_encode(array('status' => 1, 'page' => $page));
+    }
+
+    // public function check_available_quantity()
+    // {       
+    //     foreach ($this->input->post('item_id_') as $key => $value) {
+    //         $json = json_decode($this->input->post('item_id_')[$key]);
+    //         $quantity_product = $json->quantity;
+    //         $quantity         = $this->input->post('quantity')[$key];
+
+    //         if ($quantity != "" && $quantity_product != "") {
+    //             if ($quantity <= $quantity_product) {
+    //                 return true;
+    //             }
+    //             // print_r($this->input->post('item_id_'));
+    //             // die();
+    //             $this->form_validation->set_message('check_available_quantity', $this->lang->line('available_quantity') . " : " . $quantity_product);
+    //             return false;
+    //         }
+    //     }
+
+    //     return true;
+    // }
+
+    // public function check_available_quantity()
+    // {
+    //     $item_category_id = $this->input->post('item_category_id');
+    //     $item_id          = $this->input->post('item_id');
+    //     $quantity         = $this->input->post('quantity');
+    //     if ($quantity != "" && $item_category_id != "" && $item_id != "") {
+    //         $data      = $this->item_model->getItemAvailable($item_id);
+    //         $available = ($data['added_stock'] - $data['issued']);
+    //         if ($quantity <= $available) {
+    //             return true;
+    //         }
+    //         $this->form_validation->set_message('check_available_quantity', $this->lang->line('available_quantity') . " " . $available);
+    //         return false;
+    //     }
+    //     return true;
+    // }
 
     public function delete($id)
     {
@@ -194,20 +426,88 @@ class Issueitem extends Admin_Controller
 
     public function returnItem()
     {
-        $issue_id = $this->input->post('item_issue_id');
-        if ($issue_id != "") {
-            $data = array(
-                'id'          => $issue_id,
-                'is_returned' => 0,
-                'quantity'    => 0,
-                'return_date' => date('Y-m-d'),
-            );
-            $this->itemissue_model->add($data);
+        $item_issue_quantity = $this->input->post('item_issue_quantity');
+        $note_issue = $this->input->post('note_issue');
+        $item_issue_sku = $this->input->post('item_issue_sku');
+        $item_issue_id = $this->input->post('item_issue_id')[0];
+
+        // if ($issue_id != "") {
+        foreach ($item_issue_sku as $key => $value) {
+            if (!empty($value)) {
+                if (!empty($item_issue_quantity[$key])) {
+
+                    $itemSku = $this->getOneProduct($value);
+                    $responses = json_decode($itemSku, true);
+                    $producto = $responses['data']['data'];
+                    // $data['itemcatlist'] = $producto->quantity;
+
+                    $devuelto = $producto[0]['quantity'] + $item_issue_quantity[$key];
+
+                    $up = $this->updateProduct($value, $devuelto);
+
+                    $data = array(
+                        'item_issue_id'  => $item_issue_id,
+                        // 'return_date' => date('Y-m-d'),
+                        'is_returned' => 1,
+                        'sku' => $value,
+                        'return_date' => date('Y-m-d'),
+                        'quantity'    => $item_issue_quantity[$key],
+                        'note_issue' => $note_issue[$key],
+                    );
+
+                    $this->itemissue_model->add_details($data);
+                    // print_r($producto[0]['quantity'] );
+                    // die();
+                }
+            }
         }
+
+
+        // print_r($devuelto);
+        // die();
+        // }
+        // print_r($data);
+        // die();
 
         $result_final = array('status' => 'pass', 'message' => "Item retrun successfully");
         echo json_encode($result_final);
     }
+
+    // public function returnItem()
+    // {
+    //     $issue_id = $this->input->post('item_issue_id');
+    //     $item_issue_quantity = $this->input->post('quantity');
+    //     $sku = $this->input->post('sku');
+    //     if ($issue_id != "") {
+    //         $data = array(
+    //             'id'          => $issue_id,
+    //             'is_returned' => 0,
+    //             'quantity'    => $item_issue_quantity,
+    //             'return_date' => date('Y-m-d'),
+    //         );
+
+    //         if (!empty($sku)) {
+    //             $itemSku = $this->getOneProduct($sku);
+    //             $responses = json_decode($itemSku, true);
+    //             $producto = $responses['data']['data'];
+    //             // $data['itemcatlist'] = $producto->quantity;
+
+    //             $devuelto = $producto[0]['quantity'] + $this->input->post('quantity');
+
+    //             $up = $this->updateProduct($sku, $devuelto);
+    //         }
+
+    //         $this->itemissue_model->add($data);
+
+    //         // print_r($devuelto);
+    //         // die();
+    //     }
+    //     // print_r($data);
+    //     // die();
+
+    //     $result_final = array('status' => 'pass', 'message' => "Item retrun successfully");
+    //     echo json_encode($result_final);
+    // }
 
     public function issueinventoryreport()
     {
@@ -254,7 +554,6 @@ class Issueitem extends Admin_Controller
 
             $start_date = $this->customlib->dateFormatToYYYYMMDD($search['date_from']);
             $end_date   = $this->customlib->dateFormatToYYYYMMDD($search['date_to']);
-
         } else {
 
             if (isset($search['search_type']) && $search['search_type'] != '') {
@@ -267,7 +566,6 @@ class Issueitem extends Admin_Controller
 
             $start_date = $dates['from_date'];
             $end_date   = $dates['to_date'];
-
         }
 
         $reportdata = $this->itemissue_model->issueinventoryreportRecord($start_date, $end_date);
@@ -302,5 +600,4 @@ class Issueitem extends Admin_Controller
         );
         echo json_encode($json_data);
     }
-
 }

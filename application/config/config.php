@@ -24,6 +24,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
   | a PHP script and you can easily do that on your own.
   |
  */
+//$config['base_url'] = 'http://localhost/hospital-prod/backup/';
 $config['base_url'] = 'http://localhost:8084/frontHospital/';
 
 
@@ -102,7 +103,7 @@ $config['charset'] = 'UTF-8';
   | setting this variable to TRUE (boolean).  See the user guide for details.
   |
  */
-$config['enable_hooks'] = TRUE;
+$config['enable_hooks'] = FALSE;
 
 /*
   |--------------------------------------------------------------------------
@@ -316,7 +317,7 @@ $config['cache_query_string'] = FALSE;
   | https://codeigniter.com/user_guide/libraries/encryption.html
   |
  */
-$config['encryption_key'] = getenv('CI_ENCRYPTION_KEY') ?: 'change-this-to-a-long-random-string';
+$config['encryption_key'] = '';
 
 /*
   |--------------------------------------------------------------------------
@@ -375,7 +376,7 @@ $config['sess_expiration'] = 7200;
 $config['sess_save_path'] = sys_get_temp_dir();
 $config['sess_match_ip'] = FALSE;
 $config['sess_time_to_update'] = 300;
-$config['sess_regenerate_destroy'] = TRUE;
+$config['sess_regenerate_destroy'] = FALSE;
 
 /*
   |--------------------------------------------------------------------------
@@ -395,8 +396,8 @@ $config['sess_regenerate_destroy'] = TRUE;
 $config['cookie_prefix'] = '';
 $config['cookie_domain'] = '';
 $config['cookie_path'] = '/';
-$config['cookie_secure'] = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
-$config['cookie_httponly'] = TRUE;
+$config['cookie_secure'] = FALSE;
+$config['cookie_httponly'] = FALSE;
 
 /*
   |--------------------------------------------------------------------------
@@ -440,14 +441,12 @@ $config['global_xss_filtering'] = FALSE;
   | 'csrf_regenerate' = Regenerate token on every submission
   | 'csrf_exclude_uris' = Array of URIs which ignore CSRF checks
  */
-$config['csrf_protection'] = TRUE;
-$config['csrf_token_name'] = 'ci_csrf_token';
-$config['csrf_cookie_name'] = 'ci_csrf_cookie';
+$config['csrf_protection'] = FALSE;
+$config['csrf_token_name'] = 'school_csrf_name';
+$config['csrf_cookie_name'] = 'school_cookie_name';
 $config['csrf_expire'] = 7200;
 $config['csrf_regenerate'] = TRUE;
-$config['csrf_exclude_uris'] = array(
-    'api/.*'
-);
+$config['csrf_exclude_uris'] = array();
 
 /*
   |--------------------------------------------------------------------------
