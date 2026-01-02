@@ -15,6 +15,7 @@ class Radio extends Admin_Controller
         $this->load->library('Enc_lib');
         $this->load->library('mailsmsconf');
         $this->load->library('system_notification');
+        $this->load->library('AuditService');
         $this->marital_status = $this->config->item('marital_status');
         $this->payment_mode   = $this->config->item('payment_mode');
         $this->search_type    = $this->config->item('search_type');
@@ -1899,6 +1900,9 @@ class Radio extends Admin_Controller
         $data['bill_prefix']   = $this->customlib->getSessionPrefixByType('radiology_billing');
         $data['result']        = $result;
         $page                  = $this->load->view('admin/radio/_printPatientReportDetail', $data, true);
+        $this->auditservice->log('resultados', 'PRINT', 'radiology_report', $id, array(
+            'patient_id' => !empty($result) ? $result->patient_id : null,
+        ));
         echo json_encode(array('status' => 1, 'page' => $page));
     }
 
@@ -1998,6 +2002,9 @@ class Radio extends Admin_Controller
         $filepath    = $report->radiology_report;
         $report_name = $report->report_name;
         $data        = file_get_contents($filepath);
+        $this->auditservice->log('resultados', 'VIEW', 'radiology_report', $report_id, array(
+            'patient_id' => !empty($report) ? $report->patient_id : null,
+        ));
         force_download($report_name, $data);
     }
 

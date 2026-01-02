@@ -15,6 +15,7 @@ class Pathology extends Admin_Controller
         $this->load->library('mailsmsconf');
         $this->load->library('datatables');
         $this->load->library('system_notification');
+        $this->load->library('AuditService');
         $this->load->config('image_valid');
         $this->marital_status       = $this->config->item('marital_status');
         $this->payment_mode         = $this->config->item('payment_mode');
@@ -1778,6 +1779,9 @@ class Pathology extends Admin_Controller
         $result                = $this->pathology_model->getPatientPathologyReportDetails($id);
         $data['result']        = $result;
         $page                  = $this->load->view('admin/pathology/_printPatientReportDetail', $data, true);
+        $this->auditservice->log('resultados', 'PRINT', 'pathology_report', $id, array(
+            'patient_id' => !empty($result) ? $result->patient_id : null,
+        ));
         echo json_encode(array('status' => 1, 'page' => $page));
     }
 
@@ -1969,6 +1973,9 @@ class Pathology extends Admin_Controller
         $filepath    = $report->pathology_report;
         $report_name = $report->report_name;
         $data        = file_get_contents($filepath);
+        $this->auditservice->log('resultados', 'VIEW', 'pathology_report', $report_id, array(
+            'patient_id' => !empty($report) ? $report->patient_id : null,
+        ));
         force_download($report_name, $data);
     }
 

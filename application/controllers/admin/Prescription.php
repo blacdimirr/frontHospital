@@ -18,6 +18,7 @@ class Prescription extends Admin_Controller
         $this->load->model('prefix_model');
         // 
         $this->load->library('Customlib');
+        $this->load->library('AuditService');
         $this->load->helper('customfield_helper');
         $this->load->helper('custom');
         // 
@@ -43,6 +44,10 @@ class Prescription extends Admin_Controller
 
         $page           = $this->load->view('admin/patient/prescription', $data, true);
         // $page           = $this->load->view('admin/patient/_printprescription', $data, true);
+        $this->auditservice->log('pdfs', 'PRINT', 'prescription', $visitid, array(
+            'opd_id' => $result->opd_detail_id,
+            'patient_id' => $result->patient_id,
+        ));
         echo json_encode(array('status' => 1, 'page' => $page));
     }
 
@@ -73,10 +78,13 @@ class Prescription extends Admin_Controller
 
         $data["camas"] = $this->patient_model->get_case_reference_id($ipd_id_details['case_reference_id']);
 
-        
+
 
         $page           = $this->load->view('admin/patient/prescriptionMedicamentos', $data, true);
         // $page           = $this->load->view('admin/patient/_printprescription', $data, true);
+        $this->auditservice->log('pdfs', 'PRINT', 'medicamentos', $ipd_id, array(
+            'detalle_id' => $id,
+        ));
         echo json_encode(array('status' => 1, 'page' => $page));
     }
 
@@ -97,6 +105,9 @@ class Prescription extends Admin_Controller
         
 
         $page           = $this->load->view('admin/patient/_print_formulario_interconsulta', $data, true);
+        $this->auditservice->log('pdfs', 'PRINT', 'formulario_interconsulta', $visitid, array(
+            'opd_id' => $result->opd_detail_id,
+        ));
         echo json_encode(array('status' => 1, 'page' => $page));
     }
     public function printHojaIngreso()
@@ -116,6 +127,9 @@ class Prescription extends Admin_Controller
         
 
         $page           = $this->load->view('admin/patient/hoja_ingreso_print', $data, true);
+        $this->auditservice->log('pdfs', 'PRINT', 'hoja_ingreso', $visitid, array(
+            'opd_id' => $result->opd_detail_id,
+        ));
         echo json_encode(array('status' => 1, 'page' => $page));
     }
 
