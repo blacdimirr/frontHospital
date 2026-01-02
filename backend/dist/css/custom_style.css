@@ -7,3 +7,69 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+.form-control-standard,
+input.form-control-standard,
+select.form-control-standard,
+textarea.form-control-standard {
+    background-color: #fff;
+    border: 1px solid #d2d6de;
+    border-radius: 3px;
+    box-shadow: none;
+    color: #555;
+    font-size: 14px;
+    height: 38px;
+    line-height: 1.42857143;
+    padding: 6px 12px;
+}
+
+.form-control-standard:focus,
+input.form-control-standard:focus,
+select.form-control-standard:focus,
+textarea.form-control-standard:focus {
+    border-color: #3c8dbc;
+    box-shadow: none;
+}
+
+textarea.form-control-standard {
+    height: auto;
+    min-height: 90px;
+    resize: vertical;
+}
+
+.form-group label {
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.form-group .form-control,
+.form-group .select2-container--default .select2-selection--single,
+.form-group .bootstrap-select > .btn,
+.form-group .bootstrap-select .dropdown-toggle,
+.form-group .input-group-addon {
+    height: 38px;
+}
+
+.form-group .select2-container--default .select2-selection--single {
+    border-radius: 3px;
+    border: 1px solid #d2d6de;
+}
+
+.form-group .select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 36px;
+}
+
+.form-group .select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 36px;
+}
+
+.form-group .select2-container--default .select2-selection--multiple {
+    border-radius: 3px;
+    border: 1px solid #d2d6de;
+    min-height: 38px;
+}
+
+.form-group .select2-container--default .select2-selection--multiple .select2-selection__rendered {
+    padding: 4px 8px;
+    line-height: 24px;
+}
