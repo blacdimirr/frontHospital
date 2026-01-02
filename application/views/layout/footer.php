@@ -13,6 +13,59 @@
 <script src="<?php echo base_url(); ?>backend/toast-alert/toastr.js"></script>
 <script src="<?php echo base_url(); ?>backend/bootstrap/js/bootstrap.min.js"></script>
 <script src="<?php echo base_url(); ?>backend/plugins/select2/select2.full.min.js"></script>
+<script type="text/javascript">
+    (function ($) {
+        var csrfTokenName = "<?php echo $this->security->get_csrf_token_name(); ?>";
+        var csrfCookieName = "<?php echo $this->config->item('csrf_cookie_name'); ?>";
+
+        function getCookie(name) {
+            var match = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+            return match ? match.pop() : '';
+        }
+
+        function getCsrfToken() {
+            return getCookie(csrfCookieName) || "<?php echo $this->security->get_csrf_hash(); ?>";
+        }
+
+        function syncCsrfToken($form) {
+            var token = getCsrfToken();
+            var $field = $form.find('input[name="' + csrfTokenName + '"]');
+            if ($field.length) {
+                $field.val(token);
+            } else {
+                $('<input>', {
+                    type: 'hidden',
+                    name: csrfTokenName,
+                    value: token
+                }).appendTo($form);
+            }
+        }
+
+        $(document).on('submit', 'form[method="post"], form[method="POST"]', function () {
+            syncCsrfToken($(this));
+        });
+
+        $.ajaxPrefilter(function (options, originalOptions) {
+            var method = (options.type || '').toUpperCase();
+            if (method !== 'POST') {
+                return;
+            }
+            var token = getCsrfToken();
+            if (options.data instanceof FormData) {
+                options.data.append(csrfTokenName, token);
+                return;
+            }
+            if (typeof options.data === 'string') {
+                if (options.data.length) {
+                    options.data += '&';
+                }
+                options.data += encodeURIComponent(csrfTokenName) + '=' + encodeURIComponent(token);
+                return;
+            }
+            options.data = $.extend({}, options.data, { [csrfTokenName]: token });
+        });
+    })(jQuery);
+</script>
 <script src="<?php echo base_url(); ?>backend/plugins/input-mask/jquery.inputmask.js"></script>
 <script src="<?php echo base_url(); ?>backend/plugins/input-mask/jquery.inputmask.date.extensions.js"></script>
 <script src="<?php echo base_url(); ?>backend/plugins/input-mask/jquery.inputmask.extensions.js"></script>
@@ -595,4 +648,3 @@ if (isset($title)) {
     
     
 </script>
-

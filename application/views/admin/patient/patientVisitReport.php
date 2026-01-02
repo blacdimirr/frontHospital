@@ -65,7 +65,8 @@ $currency_symbol = $this->customlib->getHospitalCurrencyFormat();
                        
                         <form action="<?= base_url(); ?>admin/patient/patientvisitreport" method="post" class="form-inline pt4">
                                         <div class="box-body row">
-                                            <input type="hidden" name="ci_csrf_token" value="">                                        <div class="col-sm-6 col-md-3">
+                                            <?php echo $this->customlib->getCSRF(); ?>
+                                            <div class="col-sm-6 col-md-3">
                                            <div class="form-group" id="patient_id">
                                 <label><?php echo $this->lang->line('patient_id'); ?></label><small class="req"> *</small>
                                 <input id="patient_id" name="patient_id" placeholder="Patient ID" type="text" class="form-control" value="<?php echo set_value('patient_id'); ?>" />
