@@ -21,6 +21,7 @@ class patient extends Admin_Controller
         $this->load->library('CSVReader');
         $this->load->library('Customlib');
         $this->load->library('AuditService');
+        $this->load->library('PatientService');
         $this->load->library('system_notification');
         $this->load->library('datatables');
         $this->marital_status  = $this->config->item('marital_status');
@@ -960,6 +961,16 @@ This Function is used to Add Patient
         $this->form_validation->set_rules('age[month]', $this->lang->line('month'), 'trim|required|xss_clean|numeric');
         $this->form_validation->set_rules('age[day]', $this->lang->line('day'), 'trim|required|xss_clean|numeric');
         $this->form_validation->set_rules('file', $this->lang->line('image'), 'callback_handle_upload');
+        $this->form_validation->set_rules('documento_tipo', $this->lang->line('documento_tipo'), 'trim|xss_clean');
+        $this->form_validation->set_rules('documento_numero', $this->lang->line('documento_numero'), 'trim|xss_clean');
+        $this->form_validation->set_rules('direccion_detallada', $this->lang->line('direccion_detallada'), 'trim|xss_clean');
+        $this->form_validation->set_rules('municipio', $this->lang->line('municipio'), 'trim|xss_clean');
+        $this->form_validation->set_rules('provincia', $this->lang->line('provincia'), 'trim|xss_clean');
+        $this->form_validation->set_rules('contacto_emergencia', $this->lang->line('contacto_emergencia'), 'trim|xss_clean');
+        $this->form_validation->set_rules('responsable_legal', $this->lang->line('responsable_legal'), 'trim|xss_clean');
+        if ($this->input->post('consentimiento_datos')) {
+            $this->form_validation->set_rules('fecha_consentimiento', $this->lang->line('fecha_consentimiento'), 'trim|required|xss_clean');
+        }
         // $this->form_validation->set_rules('nationality', $this->lang->line('nationality'), 'trim|required|xss_clean');
 
         if ($this->form_validation->run() == false) {
@@ -974,6 +985,14 @@ This Function is used to Add Patient
                 'mobileno'   => form_error('mobileno'),
                 'file'       => form_error('file'),
                 // 'nationality'       => form_error('nationality'),
+                'documento_tipo' => form_error('documento_tipo'),
+                'documento_numero' => form_error('documento_numero'),
+                'direccion_detallada' => form_error('direccion_detallada'),
+                'municipio' => form_error('municipio'),
+                'provincia' => form_error('provincia'),
+                'contacto_emergencia' => form_error('contacto_emergencia'),
+                'responsable_legal' => form_error('responsable_legal'),
+                'fecha_consentimiento' => form_error('fecha_consentimiento'),
             );
 
             if (!empty($custom_fields)) {
@@ -1049,6 +1068,20 @@ This Function is used to Add Patient
             } else {
                 $blood_group = null;
             }
+            $consentimiento_datos = $this->input->post('consentimiento_datos') ? 1 : 0;
+            $fecha_consentimiento_input = $this->input->post('fecha_consentimiento');
+            $fecha_consentimiento = null;
+            if (!empty($fecha_consentimiento_input)) {
+                $fecha_consentimiento = $this->customlib->dateFormatToYYYYMMDD($fecha_consentimiento_input);
+            }
+            $sexo = $this->input->post('sexo');
+            if (empty($sexo)) {
+                $sexo = $this->input->post('gender');
+            }
+            $nacionalidad = $this->input->post('nacionalidad');
+            if (empty($nacionalidad)) {
+                $nacionalidad = $this->input->post('nationality');
+            }
             $patient_data = array(
                 'patient_name'          => $this->input->post('name'),
                 'mobileno'              => $this->input->post('mobileno'),
@@ -1069,6 +1102,18 @@ This Function is used to Add Patient
                 'identification_number' => $this->input->post('identification_number'),
                 'is_active'             => 'yes',
                 'nationality'          => $this->input->post('nationality'),
+                'documento_tipo'       => $this->input->post('documento_tipo'),
+                'documento_numero'     => $this->input->post('documento_numero'),
+                'nacionalidad'         => $nacionalidad,
+                'sexo'                 => $sexo,
+                'fecha_nacimiento'     => $dob,
+                'direccion_detallada'  => $this->input->post('direccion_detallada'),
+                'municipio'            => $this->input->post('municipio'),
+                'provincia'            => $this->input->post('provincia'),
+                'contacto_emergencia'  => $this->input->post('contacto_emergencia'),
+                'responsable_legal'    => $this->input->post('responsable_legal'),
+                'consentimiento_datos' => $consentimiento_datos,
+                'fecha_consentimiento' => $fecha_consentimiento,
             );
 
             $custom_field_post  = $this->input->post("custom_fields[patient]");
@@ -1127,6 +1172,30 @@ This Function is used to Add Patient
             $this->mailsmsconf->mailsms('login_credential', $sender_details);
         }
         echo json_encode($array);
+    }
+
+    public function possibleduplicates()
+    {
+        if (!$this->rbac->hasPrivilege('patient', 'can_view')) {
+            access_denied();
+        }
+
+        $dob_input = $this->input->post('dob');
+        $fecha_nacimiento = null;
+        if (!empty($dob_input)) {
+            $fecha_nacimiento = $this->customlib->dateFormatToYYYYMMDD($dob_input);
+        }
+
+        $payload = array(
+            'documento_tipo' => $this->input->post('documento_tipo'),
+            'documento_numero' => $this->input->post('documento_numero'),
+            'patient_name' => $this->input->post('name'),
+            'fecha_nacimiento' => $fecha_nacimiento,
+        );
+
+        $duplicates = $this->patientservice->findPossibleDuplicates($payload);
+
+        echo json_encode(array('status' => 1, 'data' => $duplicates));
     }
 
     /*
