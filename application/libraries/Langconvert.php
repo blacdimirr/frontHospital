@@ -56,14 +56,10 @@ class Langconvert {
     public function yandexTranslate($fromLang, $toLang, $text) {
 
 
-        // $transferData = array(
-        //     'key' => 'trnsl.1.1.20170328T154056Z.8b07168622735883.6cd68c2f1d1cf80bb3c55e2505e086af6b7674f6',
-        //     'lang' => $fromLang . '-' . $toLang,
-        //     'text' => $text,
-        // );
+      
 
         $transferData = array(
-            'key' => 'trnsl.1.1.20191001T080822Z.114211cde45db473.64d076985b8a701da6f0ae6b6806bdc92f060dd1',
+            'key' => 'NA',
             'lang' => $fromLang . '-' . $toLang,
             'text' => $text,
         );
